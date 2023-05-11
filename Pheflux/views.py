@@ -11,35 +11,50 @@ import csv
 def pheflux_prediction(request):
     if request.method == 'POST':
         form = PhefluxForm(request.POST)
+
         geneExp_file = request.FILES['geneExp_file']
         geneExp_temp = tempfile.NamedTemporaryFile(delete=False)
-        temp_route = geneExp_temp.name
+        gene_temp_route = geneExp_temp.name
+        print(gene_temp_route)
 
         # Guarda el contenido del archivo subido en el archivo temporal
-        with open(temp_route, 'wb+') as destino:
+        with open(gene_temp_route, 'wb+') as destino:
             for chunk in geneExp_file.chunks():
                 destino.write(chunk)
-        geneExp_temp.close()
-
-        print(temp_route)
-
-        with open(temp_route, 'r') as archivo_csv:
-            lector_csv = csv.reader(archivo_csv)
-            for fila in lector_csv:
-                print(fila)
-
+            geneExp_temp.close()
         if form.is_valid():
-            geneExp_file = request.FILES['geneExp_file']
+
             medium_file = request.FILES['medium_file']
-            print(geneExp_file.name)
-            # CREAR INPUT FILE
-            input_data = form.cleaned_data
+            medium_temp = tempfile.NamedTemporaryFile(delete=False)
+            medium_temp_route = medium_temp.name
+
+        # Guarda el contenido del archivo Medium  en el archivo temporal
+            with open(medium_temp_route, 'wb+') as destino:
+                for chunk in medium_file.chunks():
+                    destino.write(chunk)
+            medium_temp.close()
+
+            network_file = request.FILES['network_file']
+            network_temp = tempfile.NamedTemporaryFile(delete=False)
+            network_temp_route = network_temp.name
+
+        # Guarda el contenido del archivo subido en el archivo temporal
+            with open(network_temp_route, 'wb+') as destino:
+                for chunk in network_file.chunks():
+                    destino.write(chunk)
+            network_temp.close()
+
+            print(gene_temp_route)
+            print(medium_temp_route)
+            print(network_temp_route)
+
             # predictions = getFluxes(input_data)
             # return render(request, 'results.html', {'predictions': predictions})
+            # os.remove(ruta_temporal)
             return render(
                 request,
-                'pheflux.html',
-                context={'geneExp_file': geneExp_file}
+                'pheflux_form.html',
+                {'form': form}
             )
     else:
         form = PhefluxForm()
@@ -48,3 +63,7 @@ def pheflux_prediction(request):
         'pheflux_form.html',
         {'form': form}
     )
+
+
+# predictions = getFluxes(input_data)
+    # return render(request, 'results.html', {'predictions': predictions})

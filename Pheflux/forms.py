@@ -10,7 +10,7 @@ class PhefluxForm(forms.Form):
     verbosity = forms.BooleanField(required=True)
     prefix_log_file = forms.CharField(label="Log Prefix", max_length=100)
 
-    def clean_medium_file(self):
+    def clean_geneExp_file(self):
         geneExp_file = self.cleaned_data.get('geneExp_file')
         if not geneExp_file.name.endswith('.csv'):
             raise forms.ValidationError("El archivo debe ser en formato CSV.")
