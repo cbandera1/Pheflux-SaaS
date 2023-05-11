@@ -1,5 +1,4 @@
 from django import forms
-from .utils.phefluxParser import *
 
 
 class PhefluxForm(forms.Form):
@@ -7,17 +6,24 @@ class PhefluxForm(forms.Form):
     condition = forms.CharField(label="Condition", max_length=100)
     geneExp_file = forms.FileField(label="Archivo CSV")
     medium_file = forms.FileField(label="Archivo FPMK")
+    network_file = forms.FileField(label="Network")
     verbosity = forms.BooleanField(required=True)
     prefix_log_file = forms.CharField(label="Log Prefix", max_length=100)
 
-    def clean_csv_file(self):
-        geneExp_file = self.cleaned_data.get('csv_file')
+    def clean_medium_file(self):
+        geneExp_file = self.cleaned_data.get('geneExp_file')
         if not geneExp_file.name.endswith('.csv'):
             raise forms.ValidationError("El archivo debe ser en formato CSV.")
         return geneExp_file
 
-    def clean_fpmk_file(self):
-        medium_file = self.cleaned_data.get('fpmk_file')
-        if not medium_file.name.endswith('.fpmk'):
+    def clean_medium_file(self):
+        medium_file = self.cleaned_data.get('medium_file')
+        if not medium_file.name.endswith('.fpmk') or medium_file.name.endswith('.txt') or medium_file.name.endswith('.txt'):
+            raise forms.ValidationError("El archivo debe ser en formato FPMK.")
+        return medium_file
+
+    def clean_network_file(self):
+        medium_file = self.cleaned_data.get('network_file')
+        if not medium_file.name.endswith('.xml'):
             raise forms.ValidationError("El archivo debe ser en formato FPMK.")
         return medium_file
