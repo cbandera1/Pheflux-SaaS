@@ -18,7 +18,8 @@ class PhefluxForm(forms.Form):
 
     def clean_medium_file(self):
         medium_file = self.cleaned_data.get('medium_file')
-        if not medium_file.name.endswith('.fpmk') or medium_file.name.endswith('.txt') or medium_file.name.endswith('.txt'):
+        print(medium_file)
+        if not medium_file.name.endswith('.fpmk') and medium_file.name.endswith('.txt') and medium_file.name.endswith('.xml'):
             raise forms.ValidationError("El archivo debe ser en formato FPMK.")
         return medium_file
 
