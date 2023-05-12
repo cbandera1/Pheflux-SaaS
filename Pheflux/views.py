@@ -52,31 +52,21 @@ def pheflux_prediction(request):
 
             organism = request.POST["organism"]
             condition = request.POST["condition"]
-        # CREAR INPUT FILE
 
-        # field_names = ['Organism', 'Condition',
-        #                'GeneExpFile', 'Medium', 'Network']
-        # dict = {'Organism': organism, 'Condition': condition, 'GenExpFile': gene_temp_route,
-        #         'Medium': medium_temp_route, 'Network': network_temp_route}
-        # with open("Pheflux/utils/input.csv", "w") as input_file:
-        #     writer = csv.DictWriter(
-        #         input_file, fieldnames=field_names, delimiter='\t')
-        #     writer.writeheader()
-        #     writer.writerow(dict)
-        with open("Pheflux/utils/input.csv", "w") as input_file:
-            writer = csv.writer(input_file, delimiter="\t",
-                                lineterminator="\n")
-            writer.writerow(["Organism", "Condition",
-                             "GeneExpFile", "Medium", "Network",])
-            writer.writerow([organism, condition,
-                             gene_temp_route, medium_temp_route, network_temp_route])
+            with open("Pheflux/utils/input.csv", "w") as input_file:
+                writer = csv.writer(input_file, delimiter="\t",
+                                    lineterminator="\n")
+                writer.writerow(["Organism", "Condition",
+                                 "GeneExpFile", "Medium", "Network",])
+                writer.writerow([organism, condition,
+                                 gene_temp_route, medium_temp_route, network_temp_route])
 
             # Crear ruta temporal para el resultado
-            result_temp = tempfile.NamedTemporaryFile(delete=False)
-            result_temp_route = network_temp.name
+        result_temp = tempfile.NamedTemporaryFile(delete=False)
+        result_temp_route = result_temp.name
 
-            prefix_log = request.POST["prefix_log_file"]
-            verbosity = request.POST["verbosity"]
+        prefix_log = request.POST["prefix_log_file"]
+        verbosity = request.POST["verbosity"]
 
         predictions = getFluxes(
             "Pheflux/utils/input.csv", result_temp_route, prefix_log, verbosity)
