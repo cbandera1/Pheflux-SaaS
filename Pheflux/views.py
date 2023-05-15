@@ -1,10 +1,15 @@
+import io
 import os
 import tempfile
 import csv
+import requests
+import zipfile
+import pdb
+from django.http import FileResponse, HttpResponse
+from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from .forms import PhefluxForm
 from .utils.pheflux import getFluxes
-from .utils.phefluxParser import *
 
 
 # Create your views here.
@@ -62,21 +67,41 @@ def pheflux_prediction(request):
                                  gene_temp_route, medium_temp_route, network_temp_route])
 
             # Crear ruta temporal para el resultado
-        result_temp = tempfile.NamedTemporaryFile(delete=False)
-        result_temp_route = result_temp.name
 
         prefix_log = request.POST["prefix_log_file"]
         verbosity = request.POST["verbosity"]
 
         predictions = getFluxes(
-            "Pheflux/utils/input.csv", result_temp_route, prefix_log, verbosity)
+            "Pheflux/utils/input.csv", prefix_log, verbosity)
+
+        ruta_solve = f"{predictions[0]}/{predictions[1]}"
+        ruta_log = f"{predictions[0]}/{predictions[2]}"
+    # Archivo ZIP en memoria
+        buffer = io.BytesIO()
+        with zipfile.ZipFile(buffer, 'w') as zip_file:
+            # Agregar archivo 1 al ZIP
+            zip_file.write(ruta_solve, f"{predictions[1]}")
+
+        # Agregar archivo 2 al ZIP
+            zip_file.write(ruta_log, f"{predictions[2]}")
+
+    # Volver al inicio del archivo ZIP
+        buffer.seek(0)
+
+    # Crear una respuesta HTTP con el archivo ZIP
+        response = HttpResponse(
+            buffer, content_type='application/octet-stream')
+        response['Content-Disposition'] = 'attachment; filename="results.zip"'
+    # pdb.set_trace()
+        return response
+
         # return render(request, 'results.html', {'predictions': predictions})
         # os.remove(ruta_temporal)
-        return render(
-            request,
-            'pheflux_form.html',
-            {'form': form}
-        )
+        # return render(
+        #     request,
+        #     'pheflux_form.html',
+        #     {'form': form}
+        # )
     else:
         form = PhefluxForm()
     return render(
@@ -86,10 +111,23 @@ def pheflux_prediction(request):
     )
 
 
-# predictions = getFluxes(input_data)
-    # return render(request, 'results.html', {'predictions': predictions})
- # with open("utils/input.csv", "w") as input_file:
-    #     writer = csv.writer("Organism", "Condition",
-    #                         "GenExpFile", "Medium", "Network")
-    #     writer = csv.writer(form.organism, form.condition,
-    #                         gene_temp_route, medium_temp_route, network_temp_route)
+# def descargar_archivos(ruta_result, solve, log):
+#     ruta_solve = f"{ruta_result}/{solve}"
+#     ruta_log = f"{ruta_result}/{log}"
+#     # Archivo ZIP en memoria
+#     buffer = io.BytesIO()
+#     with zipfile.ZipFile(buffer, 'w') as zip_file:
+#         # Agregar archivo 1 al ZIP
+#         zip_file.write(ruta_solve, f"{solve}")
+
+#         # Agregar archivo 2 al ZIP
+#         zip_file.write(ruta_log, f"{log}")
+
+#     # Volver al inicio del archivo ZIP
+#     buffer.seek(0)
+
+#     # Crear una respuesta HTTP con el archivo ZIP
+#     response = HttpResponse(buffer, content_type='application/octet-stream')
+#     response['Content-Disposition'] = 'attachment; filename="archivos.zip"'
+#     # pdb.set_trace()
+#     return response

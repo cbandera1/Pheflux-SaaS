@@ -384,7 +384,7 @@ def actuallyTime():
 print('Welcome to PheFlux ! \n')
 
 
-def getFluxes(inputFileName, processDir, prefix_log, verbosity):
+def getFluxes(inputFileName, prefix_log, verbosity):
     processStart = time.time()
     # Table of results
     record = pd.DataFrame()
@@ -492,4 +492,4 @@ def getFluxes(inputFileName, processDir, prefix_log, verbosity):
     print('Total process time:', processTime/60,
           'min', '--> ~', (processTime/3600), 'h')
 
-    return (fluxes)
+    return (result_temp_route, f"{organism}_{condition}_{status}.fluxes.csv", f"{prefix_log}_record_{code.upper()}.log.csv")
