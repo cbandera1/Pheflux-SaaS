@@ -492,4 +492,6 @@ def getFluxes(inputFileName, prefix_log, verbosity):
     print('Total process time:', processTime/60,
           'min', '--> ~', (processTime/3600), 'h')
 
-    return (result_temp_route, f"{organism}_{condition}_{status}.fluxes.csv", f"{prefix_log}_record_{code.upper()}.log.csv")
+    resultados = [result_temp_route, f"{organism}_{condition}_{status}.fluxes.csv",
+                  f"{prefix_log}_record_{code.upper()}.log.csv"]
+    return (resultados)

@@ -2,7 +2,14 @@
   <h2>Formulario Pheflux</h2>
   <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ form.as_p }}
+    {{ formPheflux.as_p }}
+    <input type="hidden" name="form_type" value="formPheflux">
     <button type="submit">Enviar</button>
   </form>
+  <form method="post">
+    {% csrf_token %}
+    {{ formSearchBiGG.as_p }}
+    <input type="hidden" name="form_type" value="formSearchBiGG">
+    <button type="submit">Search</button>
+</form>
 {% endblock %}

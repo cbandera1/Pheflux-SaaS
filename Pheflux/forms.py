@@ -4,8 +4,8 @@ from django import forms
 class PhefluxForm(forms.Form):
     organism = forms.CharField(label="Organism", max_length=100)
     condition = forms.CharField(label="Condition", max_length=100)
-    geneExp_file = forms.FileField(label="Archivo CSV")
-    medium_file = forms.FileField(label="Archivo FPMK")
+    geneExp_file = forms.FileField(label="Archivo geneExp")
+    medium_file = forms.FileField(label="Archivo Medium")
     network_file = forms.FileField(label="Network")
     verbosity = forms.BooleanField(required=True)
     prefix_log_file = forms.CharField(label="Log Prefix", max_length=100)
@@ -28,3 +28,7 @@ class PhefluxForm(forms.Form):
         if not medium_file.name.endswith('.xml'):
             raise forms.ValidationError("El archivo debe ser en formato FPMK.")
         return medium_file
+
+
+class SearchBiGGForm(forms.Form):
+    query = forms.CharField(label='Query', max_length=100)
