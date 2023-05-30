@@ -5,6 +5,7 @@ import csv
 import requests
 import zipfile
 import pdb
+import json
 from django.http import FileResponse, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
@@ -102,8 +103,13 @@ def pheflux_prediction(request):
                 query = form.cleaned_data['query']
                 url = f'http://bigg.ucsd.edu/api/v2/search?query={query}&search_type=metabolites'
                 results = requests.get(url).json()
-                response = JsonResponse(results)
-                print(requests.get(url).json())
+                # json_data = json.dumps(results)
+                # parsed_data = json.loads(results)
+                print(type(results))
+                options = extract_options(results)
+                type(options)
+                response = HttpResponse(options)
+
             # Procesa la respuesta aquí según tus necesidades
                 return response
             # Por ejemplo, puedes imprimir el contenido de la respuesta:
@@ -120,25 +126,10 @@ def pheflux_prediction(request):
         )
 
 
-# def search(request):
-#     if request.method == 'POST':
-#         form = SearchBiGGForm(request.POST)
-#         if form.is_valid():
-#             query = form.cleaned_data['query']
-#             url = f'http://bigg.ucsd.edu/api/v2/search?query={query}&search_type=metabolites'
-#             response = requests.get(url)
+def extract_options(parsed_data):
+    options = []
+    for elemento in parsed_data['results']:
+        for valor in elemento.values():
+            options.append(valor)
 
-#             # Procesa la respuesta aquí según tus necesidades
-
-#             # Por ejemplo, puedes imprimir el contenido de la respuesta:
-#             print(response.json())
-#     else:
-#         formPheflux = PhefluxForm()
-#         formSearchBiGG = SearchBiGGForm()
-#         context = {'formPheflux': formPheflux,
-#                    'formSearchBiGG': formSearchBiGG}
-#     return render(
-#         request,
-#         'pheflux_form.html',
-#         context
-#     )
+    return options
