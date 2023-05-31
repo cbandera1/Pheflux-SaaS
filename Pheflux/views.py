@@ -100,7 +100,7 @@ def pheflux_prediction(request):
             form = SearchBiGGForm(request.POST)
             if form.is_valid():
                 query = form.cleaned_data['query']
-                url = f'http://bigg.ucsd.edu/api/v2/search?query={query}&search_type=metabolites'
+                url = f'http://bigg.ucsd.edu/api/v2/search?query={query}&search_type=models'
                 results = requests.get(url).json()
                 response = JsonResponse(results)
                 print(requests.get(url).json())
