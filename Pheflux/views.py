@@ -107,11 +107,19 @@ def pheflux_prediction(request):
                 # parsed_data = json.loads(results)
                 print(type(results))
                 options = extract_options(results)
-                type(options)
-                response = HttpResponse(options)
+                formPheflux = PhefluxForm()
+                formSearchBiGG = SearchBiGGForm()
+                print(options)
+                context = {'options': options,
+                           'formPheflux': formPheflux,
+                           'formSearchBiGG': formSearchBiGG}
 
             # Procesa la respuesta aquí según tus necesidades
-                return response
+                return render(
+                    request,
+                    'pheflux_form.html',
+                    context
+                )
             # Por ejemplo, puedes imprimir el contenido de la respuesta:
 
     else:

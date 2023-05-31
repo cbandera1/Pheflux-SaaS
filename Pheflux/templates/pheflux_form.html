@@ -1,3 +1,9 @@
+<style>
+  ul {
+      list-style-type: none; /* Elimina los puntos negros */
+      padding-left: 0; /* Elimina el espacio adicional a la izquierda */
+  }
+</style>
 {% block content %}
   <h2>Formulario Pheflux</h2>
   <form method="post" enctype="multipart/form-data">
@@ -11,5 +17,25 @@
     {{ formSearchBiGG.as_p }}
     <input type="hidden" name="form_type" value="formSearchBiGG">
     <button type="submit">Search</button>
+  </form> 
+  <h1>List Items</h1>
+  <form method="POST">
+    {% csrf_token %}
+    <ul>
+        {% for item in options %}
+            {% if forloop.counter0|divisibleby:5 %}
+                <li>
+                <input type="radio" name="selected_items" value="{{ item }}">
+            {% endif %}
+            
+            {{ item }}
+            {% if forloop.counter|divisibleby:5 or forloop.last %}
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+    <input type="hidden" name="BiggModel" value="BiggModel">
+    <button type="submit">Submit</button>
 </form>
+
 {% endblock %}
