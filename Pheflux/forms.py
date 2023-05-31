@@ -32,3 +32,18 @@ class PhefluxForm(forms.Form):
 
 class SearchBiGGForm(forms.Form):
     query = forms.CharField(label='Query', max_length=100)
+
+
+class BiggModelDownload(forms.Form):
+    selected_items = forms.ChoiceField(choices=[])
+    print(selected_items)
+
+    def __init__(self, options, *args, **kwargs):
+        super(BiggModelDownload, self).__init__(*args, **kwargs)
+        self.fields['selected_items'].choices = [
+            (item, item) for item in options]
+
+    def clean_selected_items(self):
+        selected_value = self.cleaned_data['selected_items']
+        codigo = selected_value.split()[0]
+        return codigo

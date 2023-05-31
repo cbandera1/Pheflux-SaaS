@@ -9,7 +9,7 @@ import json
 from django.http import FileResponse, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
-from .forms import PhefluxForm, SearchBiGGForm
+from .forms import PhefluxForm, SearchBiGGForm, BiggModelDownload
 from .utils.pheflux import getFluxes
 
 
@@ -114,14 +114,26 @@ def pheflux_prediction(request):
                            'formPheflux': formPheflux,
                            'formSearchBiGG': formSearchBiGG}
 
-            # Procesa la respuesta aquí según tus necesidades
                 return render(
                     request,
                     'pheflux_form.html',
                     context
                 )
-            # Por ejemplo, puedes imprimir el contenido de la respuesta:
+        elif form_type == 'BiggModel':
+            form = BiggModelDownload(request.POST)
+            # pdb.set_trace()
+            if form.is_valid():
+                query = form.cleaned_data['selected_data']
+                url = f'http://bigg.ucsd.edu/static/models/{query}.xml'
+                response = requests.get(url)
 
+                if response.status_code == 200:
+                    file_name = f'{query}.xml'
+                    with open(file_name, 'wb') as file:
+                        file.write(response.content)
+                    print("Archivo descargado exitosamente.")
+                else:
+                    print("Error al descargar el archivo:", response.status_code)
     else:
         formPheflux = PhefluxForm()
         formSearchBiGG = SearchBiGGForm()
