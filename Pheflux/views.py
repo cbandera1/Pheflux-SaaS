@@ -99,6 +99,7 @@ def pheflux_prediction(request):
             return response
         elif form_type == 'formSearchBiGG':
             form = SearchBiGGForm(request.POST)
+            formDownload = BiggModelDownload()
             if form.is_valid():
                 query = form.cleaned_data['query']
                 url = f'http://bigg.ucsd.edu/api/v2/search?query={query}&search_type=models'
@@ -109,10 +110,16 @@ def pheflux_prediction(request):
                 options = extract_options(results)
                 formPheflux = PhefluxForm()
                 formSearchBiGG = SearchBiGGForm()
+                choices = [(opcion, opcion) for opcion in options]
+                formDownload.fields['selected_items'].choices = choices
+                print(formDownload.fields['selected_items'].choices)
                 print(options)
+                print(choices)
+
                 context = {'options': options,
                            'formPheflux': formPheflux,
-                           'formSearchBiGG': formSearchBiGG}
+                           'formSearchBiGG': formSearchBiGG,
+                           'formDownload': formDownload}
 
                 return render(
                     request,
@@ -121,7 +128,8 @@ def pheflux_prediction(request):
                 )
         elif form_type == 'BiggModel':
             form = BiggModelDownload(request.POST)
-            # pdb.set_trace()
+            print(form.fields['selected_items'].choices)
+            pdb.set_trace()
             if form.is_valid():
                 query = form.cleaned_data['selected_data']
                 url = f'http://bigg.ucsd.edu/static/models/{query}.xml'

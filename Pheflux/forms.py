@@ -1,4 +1,5 @@
 from django import forms
+import pdb
 
 
 class PhefluxForm(forms.Form):
@@ -35,15 +36,24 @@ class SearchBiGGForm(forms.Form):
 
 
 class BiggModelDownload(forms.Form):
-    selected_items = forms.ChoiceField(choices=[])
-    print(selected_items)
 
-    def __init__(self, options, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
+        # Obtener las opciones pasadas como argumento
+        options = kwargs.pop('options', [])
         super(BiggModelDownload, self).__init__(*args, **kwargs)
-        self.fields['selected_items'].choices = [
-            (item, item) for item in options]
+        self.fields['selected_items'] = forms.ChoiceField(choices=options)
 
-    def clean_selected_items(self):
-        selected_value = self.cleaned_data['selected_items']
-        codigo = selected_value.split()[0]
-        return codigo
+    selected_items = forms.ChoiceField(choices=[])
+
+    # selected_items = forms.ChoiceField(choices=[])
+    # print(selected_items)
+
+    # def __init__(self, options, *args, **kwargs):
+    #     super(BiggModelDownload, self).__init__(*args, **kwargs)
+    #     self.fields['selected_items'].choices = [
+    #         (item, item) for item in options]
+
+    # def clean_selected_items(self):
+    #     selected_value = self.cleaned_data['selected_items']
+    #     codigo = selected_value.split()[0]
+    #     return codigo

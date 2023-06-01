@@ -19,13 +19,38 @@
     <button type="submit">Search</button>
   </form> 
   <h1>List Items</h1>
-  <form method="POST">
+<form method="post">
+  {% csrf_token %}
+  <ul>
+    {{ formDownload.selected_items.errors }}
+    {{ formDownload.selected_items.label_tag }}
+    {% for choice in formDownload.selected_items %}
+      {% if forloop.counter0|divisibleby:5 %}
+      <li>
+        <input type="radio" name="{{ formDownload.selected_items.name }}" value="{{ choice.value }}" id="{{ formDownload.selected_items.id_for_label }}_{{ forloop.counter0 }}" required>
+        <label for="{{ formDownload.selected_items.id_for_label }}_{{ forloop.counter0 }}">{{ choice.choice_label }}</label>
+      </li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+  <input type="hidden" name="form_type" value="BiggModel">
+  <button type="submit">Submit</button>
+</form>
+
+
+
+
+
+
+
+  {% comment %} <h1>List Items</h1>
+  <form method="post">
     {% csrf_token %}
     <ul>
         {% for item in options %}
             {% if forloop.counter0|divisibleby:5 %}
                 <li>
-                <input type="radio" name="selected_items" value="{{ item.0 }}">
+                <input type="radio" name="selected_items" value="{{ item }}">
             {% endif %}
             
             {{ item }}
@@ -36,6 +61,6 @@
     </ul>
     <input type="hidden" name="form_type" value="BiggModel">
     <button type="submit">Submit</button>
-</form>
+</form> {% endcomment %}
 
 {% endblock %}
