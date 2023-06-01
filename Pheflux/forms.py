@@ -37,13 +37,7 @@ class SearchBiGGForm(forms.Form):
 
 class BiggModelDownload(forms.Form):
 
-    def __init__(self, *args, **kwargs):
-        # Obtener las opciones pasadas como argumento
-        options = kwargs.pop('options', [])
-        super(BiggModelDownload, self).__init__(*args, **kwargs)
-        self.fields['selected_items'] = forms.ChoiceField(choices=options)
-
-    selected_items = forms.ChoiceField(choices=[])
+    query = forms.CharField(label='Query', max_length=100)
 
     # selected_items = forms.ChoiceField(choices=[])
     # print(selected_items)

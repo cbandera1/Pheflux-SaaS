@@ -110,11 +110,7 @@ def pheflux_prediction(request):
                 options = extract_options(results)
                 formPheflux = PhefluxForm()
                 formSearchBiGG = SearchBiGGForm()
-                choices = [(opcion, opcion) for opcion in options]
-                formDownload.fields['selected_items'].choices = choices
-                print(formDownload.fields['selected_items'].choices)
                 print(options)
-                print(choices)
 
                 context = {'options': options,
                            'formPheflux': formPheflux,
@@ -127,21 +123,26 @@ def pheflux_prediction(request):
                     context
                 )
         elif form_type == 'BiggModel':
-            form = BiggModelDownload(request.POST)
-            print(form.fields['selected_items'].choices)
-            pdb.set_trace()
-            if form.is_valid():
-                query = form.cleaned_data['selected_data']
-                url = f'http://bigg.ucsd.edu/static/models/{query}.xml'
-                response = requests.get(url)
+            query = request.POST.get('query')
+            url = f'http://bigg.ucsd.edu/static/models/{query}.xml'
+            response = requests.get(url)
 
-                if response.status_code == 200:
-                    file_name = f'{query}.xml'
-                    with open(file_name, 'wb') as file:
-                        file.write(response.content)
-                    print("Archivo descargado exitosamente.")
-                else:
-                    print("Error al descargar el archivo:", response.status_code)
+            if response.status_code == 200:
+                file_name = f'{query}.xml'
+                with open(file_name, 'wb') as file:
+                    file.write(response.content)
+                print("Archivo descargado exitosamente.")
+                formPheflux = PhefluxForm()
+                formSearchBiGG = SearchBiGGForm()
+                context = {'formPheflux': formPheflux,
+                           'formSearchBiGG': formSearchBiGG}
+                return render(
+                    request,
+                    'pheflux_form.html',
+                    context
+                )
+            else:
+                print("Error al descargar el archivo:", response.status_code)
     else:
         formPheflux = PhefluxForm()
         formSearchBiGG = SearchBiGGForm()
