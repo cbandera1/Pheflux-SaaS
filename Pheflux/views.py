@@ -6,10 +6,11 @@ import requests
 import zipfile
 import pdb
 import json
+import re
 from django.http import FileResponse, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
-from .forms import PhefluxForm, SearchBiGGForm, BiggModelDownload
+from .forms import PhefluxForm, SearchBiGGForm, SearchTCGAForm
 from .utils.pheflux import getFluxes
 
 
@@ -99,7 +100,6 @@ def pheflux_prediction(request):
             return response
         elif form_type == 'formSearchBiGG':
             form = SearchBiGGForm(request.POST)
-            formDownload = BiggModelDownload()
             if form.is_valid():
                 query = form.cleaned_data['query']
                 url = f'http://bigg.ucsd.edu/api/v2/search?query={query}&search_type=models'
@@ -114,8 +114,8 @@ def pheflux_prediction(request):
 
                 context = {'options': options,
                            'formPheflux': formPheflux,
-                           'formSearchBiGG': formSearchBiGG,
-                           'formDownload': formDownload}
+                           'formSearchBiGG': formSearchBiGG
+                           }
 
                 return render(
                     request,
@@ -143,11 +143,24 @@ def pheflux_prediction(request):
                 )
             else:
                 print("Error al descargar el archivo:", response.status_code)
+        elif form_type == 'formSearchTCGA':
+            form = SearchTCGAForm(request.POST)
+            if form.is_valid():
+                query = form.cleaned_data['query']
+                file_name = download_file(query)
+                with open(file_name, "rb") as file:
+                    response = HttpResponse(
+                        file.read(), content_type="application/octet-stream")
+                    response["Content-Disposition"] = f"attachment; filename={file_name}"
+                    print(response)
+                    return response
     else:
         formPheflux = PhefluxForm()
         formSearchBiGG = SearchBiGGForm()
+        formSearchTCGA = SearchTCGAForm()
         context = {'formPheflux': formPheflux,
-                   'formSearchBiGG': formSearchBiGG}
+                   'formSearchBiGG': formSearchBiGG,
+                   'formSearchTCGA': formSearchTCGA}
         return render(
             request,
             'pheflux_form.html',
@@ -162,3 +175,20 @@ def extract_options(parsed_data):
             options.append(valor)
 
     return options
+
+
+def download_file(file_id):
+    data_endpt = "https://api.gdc.cancer.gov/data/{}".format(file_id)
+
+    response = requests.get(data_endpt, headers={
+                            "Content-Type": "application/json"})
+
+    # Obtener el nombre del archivo del encabezado Content-Disposition
+    response_head_cd = response.headers["Content-Disposition"]
+    file_name = re.findall("filename=(.+)", response_head_cd)[0]
+    print(file_name)
+
+    with open(file_name, "wb") as output_file:
+        output_file.write(response.content)
+
+    return file_name

@@ -18,6 +18,13 @@
     <input type="hidden" name="form_type" value="formSearchBiGG">
     <button type="submit">Search</button>
   </form> 
+
+  <form method="post">
+    {% csrf_token %}
+    {{ formSearchTCGA.as_p }}
+    <input type="hidden" name="form_type" value="formSearchTCGA">
+    <button type="submit">Search</button>
+  </form> 
   {% comment %} <h1>List Items</h1>
 <form method="post">
   {% csrf_token %}
@@ -61,6 +68,7 @@
     </ul>
     <input type="hidden" name="form_type" value="BiggModel">
     <button type="submit">Submit</button>
+
 </form> 
 
 {% endblock %}

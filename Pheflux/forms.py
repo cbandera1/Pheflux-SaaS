@@ -35,8 +35,7 @@ class SearchBiGGForm(forms.Form):
     query = forms.CharField(label='Query', max_length=100)
 
 
-class BiggModelDownload(forms.Form):
-
+class SearchTCGAForm(forms.Form):
     query = forms.CharField(label='Query', max_length=100)
 
     # selected_items = forms.ChoiceField(choices=[])
