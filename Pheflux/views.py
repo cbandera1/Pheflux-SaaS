@@ -110,11 +110,13 @@ def pheflux_prediction(request):
                 options = extract_options(results)
                 formPheflux = PhefluxForm()
                 formSearchBiGG = SearchBiGGForm()
+                formSearchTCGA = SearchTCGAForm()
                 print(options)
 
                 context = {'options': options,
                            'formPheflux': formPheflux,
-                           'formSearchBiGG': formSearchBiGG
+                           'formSearchBiGG': formSearchBiGG,
+                           'formSearchTCGA': formSearchTCGA
                            }
 
                 return render(

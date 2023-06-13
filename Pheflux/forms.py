@@ -32,11 +32,11 @@ class PhefluxForm(forms.Form):
 
 
 class SearchBiGGForm(forms.Form):
-    query = forms.CharField(label='Query', max_length=100)
+    query = forms.CharField(label='BiGG', max_length=100)
 
 
 class SearchTCGAForm(forms.Form):
-    query = forms.CharField(label='Query', max_length=100)
+    query = forms.CharField(label='TCGA', max_length=100)
 
     # selected_items = forms.ChoiceField(choices=[])
     # print(selected_items)
