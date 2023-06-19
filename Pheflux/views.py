@@ -156,14 +156,109 @@ def pheflux_prediction(request):
         elif form_type == 'formSearchTCGA':
             form = SearchTCGAForm(request.POST)
             if form.is_valid():
+                files_endpt = "https://api.gdc.cancer.gov/files"
                 query = form.cleaned_data['query']
-                file_name = download_file(query)
-                with open(file_name, "rb") as file:
-                    response = HttpResponse(
-                        file.read(), content_type="application/octet-stream")
-                    response["Content-Disposition"] = f"attachment; filename={file_name}"
-                    print(response)
-                    return response
+                filters = {
+                    "op": "and",
+                    "content": [
+                        {
+                            "op": "in",
+                            "content": {
+                                "field": "cases.primary_site",
+                                "value": [query]
+                            }
+
+                        },
+                        {
+                            "op": "in",
+                            "content": {
+                                "field": "cases.project.program.name",
+                                "value": ["TCGA"]
+                            }
+                        },
+                        {
+                            "op": "in",
+                            "content": {
+                                "field": "files.data_type",
+                                "value": ["Gene Expression Quantification"]
+                            }
+                        }
+                        # {
+                        #     "op": "in",
+                        #     "content": {
+                        #         "field": "files.analysis.workflow_type",
+                        #         "value": ["FM Copy Number Variation"]
+                        #     }
+                        # }
+                    ]
+                }
+                # filters = {
+                #     "op": "=",
+                #     "content": {
+                #         "field": "cases.demographic.gender",
+                #         "value": [
+                #             "male"
+                #         ]
+                #     }
+                # }
+                params = {
+                    "filters": json.dumps(filters),
+                    "fields": "file_id",
+                    "format": "JSON",
+                    "size": "1"
+                }
+                response = requests.get(files_endpt, params=params)
+
+                file_entry = json.loads(
+                    response.content.decode("utf-8"))
+
+                file_uuid_list = []
+                for file_entry in json.loads(response.content.decode("utf-8"))["data"]["hits"]:
+                    file_uuid_list.append(file_entry["file_id"])
+
+                download_file(file_uuid_list)
+                # data_endpt = "https://api.gdc.cancer.gov/data"
+                # params = {"ids": file_uuid_list}
+
+                # response = requests.post(data_endpt, data=json.dumps(
+                #     params), headers={"Content-Type": "application/json"})
+
+                # response_head_cd = response.headers["Content-Disposition"]
+
+                # file_name = re.findall("filename=(.+)", response_head_cd)[0]
+
+                # with open(file_name, "wb") as output_file:
+                #     output_file.write(response.content)
+
+                # file_entries = file_entry["data"]["hits"]
+                # for entry in file_entries:
+                #     file_uuid = entry["file_id"]
+                #     file_uuid_list.append(file_uuid)
+                # data_endpt = "https://api.gdc.cancer.gov/data"
+                # params = {"ids": file_uuid_list}
+                # response = requests.post(data_endpt, data=json.dumps(
+                #     params), headers={"Content-Type": "application/json"})
+                # pdb.set_trace()
+                # response_head_cd = response.headers["Content-Disposition"]
+
+                # file_name = re.findall("filename=(.+)", response_head_cd)[0]
+
+                # with open(file_name, "wb") as output_file:
+                #     output_file.write(response.content)
+
+
+###############################################
+
+            # form = SearchTCGAForm(request.POST)
+            # if form.is_valid():
+            #     query = form.cleaned_data['query']
+            #     file_name = download_file(query)
+            #     with open(file_name, "rb") as file:
+            #         response = HttpResponse(
+            #             file.read(), content_type="application/octet-stream")
+            #         response["Content-Disposition"] = f"attachment; filename={file_name}"
+            #         print(response)
+            #         return response
 
     # Caso de que no sea una peticion POST renderiza los formularios
     else:
@@ -190,16 +285,14 @@ def extract_options(parsed_data):
     return options
 
 
-def download_file(file_id):
-    data_endpt = "https://api.gdc.cancer.gov/data/{}".format(file_id)
+def download_file(file_uuid_list):
+    data_endpt = "https://api.gdc.cancer.gov/data"
+    params = {"ids": file_uuid_list}
+    response = requests.post(data_endpt, data=json.dumps(
+        params), headers={"Content-Type": "application/json"})
 
-    response = requests.get(data_endpt, headers={
-                            "Content-Type": "application/json"})
-
-    # Obtener el nombre del archivo del encabezado Content-Disposition
     response_head_cd = response.headers["Content-Disposition"]
     file_name = re.findall("filename=(.+)", response_head_cd)[0]
-    print(file_name)
 
     with open(file_name, "wb") as output_file:
         output_file.write(response.content)
