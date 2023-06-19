@@ -192,15 +192,6 @@ def pheflux_prediction(request):
                         # }
                     ]
                 }
-                # filters = {
-                #     "op": "=",
-                #     "content": {
-                #         "field": "cases.demographic.gender",
-                #         "value": [
-                #             "male"
-                #         ]
-                #     }
-                # }
                 params = {
                     "filters": json.dumps(filters),
                     "fields": "file_id",
@@ -217,48 +208,17 @@ def pheflux_prediction(request):
                     file_uuid_list.append(file_entry["file_id"])
 
                 download_file(file_uuid_list)
-                # data_endpt = "https://api.gdc.cancer.gov/data"
-                # params = {"ids": file_uuid_list}
-
-                # response = requests.post(data_endpt, data=json.dumps(
-                #     params), headers={"Content-Type": "application/json"})
-
-                # response_head_cd = response.headers["Content-Disposition"]
-
-                # file_name = re.findall("filename=(.+)", response_head_cd)[0]
-
-                # with open(file_name, "wb") as output_file:
-                #     output_file.write(response.content)
-
-                # file_entries = file_entry["data"]["hits"]
-                # for entry in file_entries:
-                #     file_uuid = entry["file_id"]
-                #     file_uuid_list.append(file_uuid)
-                # data_endpt = "https://api.gdc.cancer.gov/data"
-                # params = {"ids": file_uuid_list}
-                # response = requests.post(data_endpt, data=json.dumps(
-                #     params), headers={"Content-Type": "application/json"})
-                # pdb.set_trace()
-                # response_head_cd = response.headers["Content-Disposition"]
-
-                # file_name = re.findall("filename=(.+)", response_head_cd)[0]
-
-                # with open(file_name, "wb") as output_file:
-                #     output_file.write(response.content)
-
-
-###############################################
-
-            # form = SearchTCGAForm(request.POST)
-            # if form.is_valid():
-            #     query = form.cleaned_data['query']
-            #     file_name = download_file(query)
-            #     with open(file_name, "rb") as file:
-            #         response = HttpResponse(
-            #             file.read(), content_type="application/octet-stream")
-            #         response["Content-Disposition"] = f"attachment; filename={file_name}"
-            #         print(response)
-            #         return response
+                formPheflux = PhefluxForm()
+                formSearchBiGG = SearchBiGGForm()
+                formSearchTCGA = SearchTCGAForm()
+                context = {'formPheflux': formPheflux,
+                           'formSearchBiGG': formSearchBiGG,
+                           'formSearchTCGA': formSearchTCGA}
+                return render(
+                    request,
+                    'pheflux_form.html',
+                    context
+                )
 
     # Caso de que no sea una peticion POST renderiza los formularios
     else:
@@ -290,11 +250,13 @@ def download_file(file_uuid_list):
     params = {"ids": file_uuid_list}
     response = requests.post(data_endpt, data=json.dumps(
         params), headers={"Content-Type": "application/json"})
+    if response.status_code == 200:
+        response_head_cd = response.headers["Content-Disposition"]
+        file_name = re.findall("filename=(.+)", response_head_cd)[0]
 
-    response_head_cd = response.headers["Content-Disposition"]
-    file_name = re.findall("filename=(.+)", response_head_cd)[0]
-
-    with open(file_name, "wb") as output_file:
-        output_file.write(response.content)
-
+        with open(file_name, "wb") as output_file:
+            output_file.write(response.content)
+        print("Archivo descargado exitosamente.")
+    else:
+        print("Error al descargar el archivo:", response.status_code)
     return file_name
