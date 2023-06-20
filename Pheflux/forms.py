@@ -27,7 +27,7 @@ class PhefluxForm(forms.Form):
     def clean_network_file(self):
         medium_file = self.cleaned_data.get('network_file')
         if not medium_file.name.endswith('.xml'):
-            raise forms.ValidationError("El archivo debe ser en formato FPMK.")
+            raise forms.ValidationError("El archivo debe ser en formato xml.")
         return medium_file
 
 

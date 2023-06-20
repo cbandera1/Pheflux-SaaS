@@ -140,26 +140,20 @@ def pheflux_prediction(request):
 
                 # Se genera un archivo temporal para guardar los datos
                 file_name = f'{query}.xml'
-                tempfile._get_candidate_names = gcn
-                BiGG_temp = tempfile.NamedTemporaryFile(
-                    prefix=query, suffix='.xml', delete=False)
+                BiGG_temp = tempfile.NamedTemporaryFile(delete=False)
                 Bigg_temp_route = BiGG_temp.name
 
             # Guarda el contenido del archivo geneExp subido en el archivo temporal
                 with open(Bigg_temp_route, 'wb+') as destino:
                     destino.write(response.content)
+                with open(Bigg_temp_route, 'rb') as archivo:
+                    contenido = archivo.read()
                 print("Archivo descargado exitosamente.")
-                formPheflux = PhefluxForm()
-                formSearchBiGG = SearchBiGGForm()
+                response = HttpResponse(
+                    contenido, content_type='application/xml')
+                response['Content-Disposition'] = f'attachment; filename="{file_name}"'
 
-                context = {'formPheflux': formPheflux,
-                           'formSearchBiGG': formSearchBiGG,
-                           'BiggTempRoute': Bigg_temp_route}
-                return render(
-                    request,
-                    'pheflux_form.html',
-                    context
-                )
+                return response
 
         # Caso error
             else:
@@ -238,7 +232,8 @@ def pheflux_prediction(request):
         formSearchTCGA = SearchTCGAForm()
         context = {'formPheflux': formPheflux,
                    'formSearchBiGG': formSearchBiGG,
-                   'formSearchTCGA': formSearchTCGA}
+                   'formSearchTCGA': formSearchTCGA
+                   }
         return render(
             request,
             'pheflux_form.html',
@@ -271,10 +266,3 @@ def download_file(file_uuid_list):
     else:
         print("Error al descargar el archivo:", response.status_code)
     return file_name
-
-
-def gcn():
-    # Disable appending a random sequence
-    # to the temporary name, or add more
-    # characters to that name if necessary
-    return iter(["", "a", "b", "c", "d", "e"])
