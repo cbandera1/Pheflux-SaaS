@@ -137,19 +137,30 @@ def pheflux_prediction(request):
             response = requests.get(url)
         # Caso de exito se crea un archivo .xml con el nombre del archivo y se le escribe la informacion
             if response.status_code == 200:
+
+                # Se genera un archivo temporal para guardar los datos
                 file_name = f'{query}.xml'
-                with open(file_name, 'wb') as file:
-                    file.write(response.content)
+                tempfile._get_candidate_names = gcn
+                BiGG_temp = tempfile.NamedTemporaryFile(
+                    prefix=query, suffix='.xml', delete=False)
+                Bigg_temp_route = BiGG_temp.name
+
+            # Guarda el contenido del archivo geneExp subido en el archivo temporal
+                with open(Bigg_temp_route, 'wb+') as destino:
+                    destino.write(response.content)
                 print("Archivo descargado exitosamente.")
                 formPheflux = PhefluxForm()
                 formSearchBiGG = SearchBiGGForm()
+
                 context = {'formPheflux': formPheflux,
-                           'formSearchBiGG': formSearchBiGG}
+                           'formSearchBiGG': formSearchBiGG,
+                           'BiggTempRoute': Bigg_temp_route}
                 return render(
                     request,
                     'pheflux_form.html',
                     context
                 )
+
         # Caso error
             else:
                 print("Error al descargar el archivo:", response.status_code)
@@ -260,3 +271,10 @@ def download_file(file_uuid_list):
     else:
         print("Error al descargar el archivo:", response.status_code)
     return file_name
+
+
+def gcn():
+    # Disable appending a random sequence
+    # to the temporary name, or add more
+    # characters to that name if necessary
+    return iter(["", "a", "b", "c", "d", "e"])
