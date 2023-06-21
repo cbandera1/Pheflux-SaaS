@@ -212,18 +212,7 @@ def pheflux_prediction(request):
                 for file_entry in json.loads(response.content.decode("utf-8"))["data"]["hits"]:
                     file_uuid_list.append(file_entry["file_id"])
 
-                download_file(file_uuid_list)
-                formPheflux = PhefluxForm()
-                formSearchBiGG = SearchBiGGForm()
-                formSearchTCGA = SearchTCGAForm()
-                context = {'formPheflux': formPheflux,
-                           'formSearchBiGG': formSearchBiGG,
-                           'formSearchTCGA': formSearchTCGA}
-                return render(
-                    request,
-                    'pheflux_form.html',
-                    context
-                )
+                return download_file(file_uuid_list, query)
 
     # Caso de que no sea una peticion POST renderiza los formularios
     else:
@@ -251,7 +240,7 @@ def extract_options(parsed_data):
     return options
 
 
-def download_file(file_uuid_list):
+def download_file(file_uuid_list, query):
     data_endpt = "https://api.gdc.cancer.gov/data"
     params = {"ids": file_uuid_list}
     response = requests.post(data_endpt, data=json.dumps(
@@ -260,9 +249,26 @@ def download_file(file_uuid_list):
         response_head_cd = response.headers["Content-Disposition"]
         file_name = re.findall("filename=(.+)", response_head_cd)[0]
 
+# Se genera un archivo temporal para guardar los datos
+
+        BiGG_temp = tempfile.NamedTemporaryFile(delete=False)
+        Bigg_temp_route = BiGG_temp.name
+
+        # Guarda el contenido del archivo geneExp subido en el archivo temporal
+        with open(Bigg_temp_route, 'wb+') as destino:
+            destino.write(response.content)
+        with open(Bigg_temp_route, 'rb') as archivo:
+            contenido = archivo.read()
+
         with open(file_name, "wb") as output_file:
             output_file.write(response.content)
         print("Archivo descargado exitosamente.")
+        with open(file_name, 'rb') as archivo:
+            contenido = archivo.read()
+        response = HttpResponse(
+            contenido, content_type='application/xml')
+        response['Content-Disposition'] = f'attachment; filename="{file_name}"'
+        return response
     else:
         print("Error al descargar el archivo:", response.status_code)
     return file_name
