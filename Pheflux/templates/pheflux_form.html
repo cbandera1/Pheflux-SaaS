@@ -4,11 +4,12 @@
       padding-left: 0; /* Elimina el espacio adicional a la izquierda */
   }
 </style>
+{% load crispy_forms_tags %}
 {% block content %}
   <h2>Formulario Pheflux</h2>
   <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ formPheflux.as_p }}
+    {% csrf_token %}  
+    {% crispy formPheflux %}
     <input type="hidden" name="form_type" value="formPheflux">
     <button type="submit">Enviar</button>
   </form>
@@ -45,7 +46,5 @@
     <button type="submit">Submit</button>
 
 </form> 
-<h2> {{ BiggTempRoute }} </h2> 
-<div id="file-name-container"></div>
 
 {% endblock %}

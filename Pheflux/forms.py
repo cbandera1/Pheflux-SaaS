@@ -1,5 +1,8 @@
 from django import forms
 import pdb
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Submit
+
 
 
 class PhefluxForm(forms.Form):
@@ -10,6 +13,21 @@ class PhefluxForm(forms.Form):
     network_file = forms.FileField(label="Network")
     verbosity = forms.BooleanField(required=True)
     prefix_log_file = forms.CharField(label="Log Prefix", max_length=100)
+    
+    def __init__(self, *args, **kwargs):
+        super(PhefluxForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.layout = Layout(
+            'organism',
+            'condition',
+            'geneExp_file',
+            'medium_file',
+            'network_file',
+            'verbosity',
+            'prefix_log_file',
+            Submit('submit', 'Submit')
+        )
 
     def clean_geneExp_file(self):
         geneExp_file = self.cleaned_data.get('geneExp_file')
