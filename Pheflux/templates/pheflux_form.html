@@ -1,8 +1,15 @@
+<style>
+  ul {
+      list-style-type: none; /* Elimina los puntos negros */
+      padding-left: 0; /* Elimina el espacio adicional a la izquierda */
+  }
+</style>
+{% load crispy_forms_tags %}
 {% block content %}
   <h2>Formulario Pheflux</h2>
   <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ formPheflux.as_p }}
+    {% csrf_token %}  
+    {% crispy formPheflux %}
     <input type="hidden" name="form_type" value="formPheflux">
     <button type="submit">Enviar</button>
   </form>
@@ -11,5 +18,40 @@
     {{ formSearchBiGG.as_p }}
     <input type="hidden" name="form_type" value="formSearchBiGG">
     <button type="submit">Search</button>
-</form>
+  </form> 
+
+  <form method="post">
+    {% csrf_token %}
+    {{ formSearchTCGA.as_p }}
+    <input type="hidden" name="form_type" value="formSearchTCGA">
+    <button type="submit">Search</button>
+  </form> 
+  {% if options %}
+  <h1>Resultados BiGG Model</h1>
+  {% endif %}
+  <form method="post">
+    {% csrf_token %}
+    <ul>
+        {% for item in options %}
+            {% if forloop.counter0|divisibleby:5 %}
+                <li>
+                <input type="radio" name="query" value="{{ item }}">
+            {% endif %}
+            
+            {{ item }}
+            {% if forloop.counter|divisibleby:5 or forloop.last %}
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+    {% if options %}
+    <input type="hidden" name="form_type" value="BiggModelDownload">
+    <button type="submit">Submit</button>
+    {% endif %}
+
+</form> 
+<<<<<<< HEAD
+=======
+
+>>>>>>> dfd7cb2472d856702c970dcc372546f8bb3f0701
 {% endblock %}

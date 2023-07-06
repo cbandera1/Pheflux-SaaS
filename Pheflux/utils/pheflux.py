@@ -457,9 +457,11 @@ def getFluxes(inputFileName, prefix_log, verbosity):
             atime = actuallyTime()
             print(atime, "Saving metabolic fluxes...")
         # fluxes
-        result_temp = tempfile.NamedTemporaryFile(delete=False)
+        # Crea archivo temporal
+        result_temp = tempfile.TemporaryDirectory()
+        # obtiene ruta del archivo temporal
         result_temp_route = os.path.dirname(result_temp.name)
-
+        #
         resultsFile = os.path.join(
             result_temp_route, f"{organism}_{condition}_{status}.fluxes.csv")
 
