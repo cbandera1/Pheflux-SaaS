@@ -109,7 +109,9 @@ def pheflux_prediction(request):
             if form.is_valid():
                 # Se obtiene la query ingresada
                 query = form.cleaned_data['query']
+
             # Se realiza la peticion a la base de datos que retorna en formato JSON al cual se le extraen los resultados como opciones
+
                 url = f'http://bigg.ucsd.edu/api/v2/search?query={query}&search_type=models'
                 results = requests.get(url).json()
                 options = extract_options(results)
