@@ -457,15 +457,16 @@ def getFluxes(inputFileName, prefix_log, verbosity):
             atime = actuallyTime()
             print(atime, "Saving metabolic fluxes...")
         # fluxes
-        # Crea archivo temporal
+        # Crea ruta temporal
         result_temp = tempfile.TemporaryDirectory()
-        # obtiene ruta del archivo temporal
+        # Obtiene ruta temporal
         result_temp_route = os.path.dirname(result_temp.name)
-        #
+        # Construye una ruta de archivo en la ruta temporal
         resultsFile = os.path.join(
             result_temp_route, f"{organism}_{condition}_{status}.fluxes.csv")
-
+        # Guarda el data grame en la ruta creada
         fluxes.to_csv(resultsFile, sep='\t')
+
         # summary table
         record = recordTable(record, condition, lbx, ubx, total_time, status)
 
@@ -482,6 +483,7 @@ def getFluxes(inputFileName, prefix_log, verbosity):
     # Save summary table
     code = ''.join(random.SystemRandom().choice(
         string.ascii_letters + string.digits) for _ in range(4))
+    # Crea ruta de archivo en ruta temporal
     recordFile = os.path.join(
         result_temp_route+'/'+prefix_log+'_record_'+code.upper()+'.log.csv')
     record.to_csv(recordFile, sep='\t', index=False)
