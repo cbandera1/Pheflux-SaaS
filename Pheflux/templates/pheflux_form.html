@@ -25,7 +25,9 @@
     <input type="hidden" name="form_type" value="formSearchTCGA">
     <button type="submit">Search</button>
   </form> 
-  <h1>List Items</h1>
+  {% if options %}
+  <h1>Resultados BiGG Model</h1>
+  {% endif %}
   <form method="post">
     {% csrf_token %}
     <ul>
@@ -41,11 +43,10 @@
             {% endif %}
         {% endfor %}
     </ul>
+    {% if options %}
     <input type="hidden" name="form_type" value="BiggModelDownload">
     <button type="submit">Submit</button>
+    {% endif %}
 
 </form> 
-<h2> {{ BiggTempRoute }} </h2> 
-<div id="file-name-container"></div>
-
 {% endblock %}

@@ -188,13 +188,13 @@ def pheflux_prediction(request):
                                 "value": ["Gene Expression Quantification"]
                             }
                         }
-                        # {
-                        #     "op": "in",
-                        #     "content": {
-                        #         "field": "files.analysis.workflow_type",
-                        #         "value": ["FM Copy Number Variation"]
+                        #     {
+                        #         "op": "in",
+                        #         "content": {
+                        #             "field": "files.analysis.workflow_type",
+                        #             "value": ["FM Copy Number Variation"]
+                        #         }
                         #     }
-                        # }
                     ]
                 }
                 params = {
@@ -251,20 +251,18 @@ def download_file(file_uuid_list, query):
 
 # Se genera un archivo temporal para guardar los datos
 
-        BiGG_temp = tempfile.NamedTemporaryFile(delete=False)
-        Bigg_temp_route = BiGG_temp.name
+        TCGA_temp = tempfile.NamedTemporaryFile(delete=False)
+        TCGA_temp_route = TCGA_temp.name
 
         # Guarda el contenido del archivo geneExp subido en el archivo temporal
-        with open(Bigg_temp_route, 'wb+') as destino:
+        with open(TCGA_temp_route, 'wb+') as destino:
             destino.write(response.content)
-        with open(Bigg_temp_route, 'rb') as archivo:
+
+        print("Archivo descargado exitosamente.")
+
+        with open(TCGA_temp_route, 'rb') as archivo:
             contenido = archivo.read()
 
-        with open(file_name, "wb") as output_file:
-            output_file.write(response.content)
-        print("Archivo descargado exitosamente.")
-        with open(file_name, 'rb') as archivo:
-            contenido = archivo.read()
         response = HttpResponse(
             contenido, content_type='application/xml')
         response['Content-Disposition'] = f'attachment; filename="{file_name}"'
