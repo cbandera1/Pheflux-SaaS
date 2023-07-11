@@ -44,5 +44,5 @@ class SearchTCGAForm(forms.Form):
         ('Bronchus and lung', 'Bronchus and lung'),
         ('Kidney', 'Kidney'),
     ]
-    query = forms.CharField(label='TCGA: ', max_length=100,
+    query = forms.CharField(label="Search GeneExp in TCGA", max_length=100,
                             widget=forms.Select(choices=TCGA_CHOICES))

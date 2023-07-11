@@ -6,44 +6,58 @@
 
 
 {% block content %}
-<div class ="text-center">
-<h2 class="text-primary">Formulario Pheflux</h2>
+<div class ="container text-center w-25 rounded mt-5 pb-1 border border-secondary " style="background-color: #f6f6f6;">
+<h2 class="">Pheflux</h2>
 {% if formPheflux %}
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}  
-    <div class="form-group mt-5 mb-2">
-      <label for="{{ formPheflux.organism.id_for_label }}">{{ formPheflux.organism.label }}</label>
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}  
+  <div class="form-group row mt-5 mb-2">
+    <label for="{{ formPheflux.organism.id_for_label }}" class="col-md-4 text-md-right">{{ formPheflux.organism.label }}</label>
+    <div class="col-md-6">
       {{ formPheflux.organism }}
     </div>
-    <div class="form-group mb-2">
-      <label for="{{ formPheflux.condition.id_for_label }}">{{ formPheflux.condition.label }}</label>
+  </div>
+  <div class="form-group row mb-2">
+    <label for="{{ formPheflux.condition.id_for_label }}" class="col-md-4 text-md-right">{{ formPheflux.condition.label }}</label>
+    <div class="col-md-6">
       {{ formPheflux.condition }}
     </div>
-    <div class="form-group mb-2">
-      <label for="{{ formPheflux.geneExp_file.id_for_label }}">{{ formPheflux.geneExp_file.label }}</label>
+  </div>
+  <div class="form-group row mb-2">
+    <label for="{{ formPheflux.geneExp_file.id_for_label }}" class="col-md-4 text-md-right">{{ formPheflux.geneExp_file.label }}</label>
+    <div class="col-md-6">
       {{ formPheflux.geneExp_file }}
     </div>
-    <div class="form-group mb-2">
-      <label for="{{ formPheflux.medium_file.id_for_label }}">{{ formPheflux.medium_file.label }}</label>
+  </div>
+  <div class="form-group row mb-2">
+    <label for="{{ formPheflux.medium_file.id_for_label }}" class="col-md-4 text-md-right">{{ formPheflux.medium_file.label }}</label>
+    <div class="col-md-6">
       {{ formPheflux.medium_file }}
     </div>
-    <div class="form-group mb-2">
-      <label for="{{ formPheflux.network_file.id_for_label }}">{{ formPheflux.network_file.label }}</label>
+  </div>
+  <div class="form-group row mb-2">
+    <label for="{{ formPheflux.network_file.id_for_label }}" class="col-md-4 text-md-right">{{ formPheflux.network_file.label }}</label>
+    <div class="col-md-6">
       {{ formPheflux.network_file }}
     </div>
-    <div class="form-group mb-2">
+  </div>
+  <div class="form-group row mb-2">
+    <label for="{{ formPheflux.prefix_log_file.id_for_label }}" class="col-md-4 text-md-right">{{ formPheflux.prefix_log_file.label }}</label>
+    <div class="col-md-6">
+      {{ formPheflux.prefix_log_file }}
+    </div>
+  </div>
+  
+    <div class="">
       <div class="form-check">
         {{ formPheflux.verbosity }}
         <label class="form-check-label" for="{{ formPheflux.verbosity.id_for_label }}">{{ formPheflux.verbosity.label }}</label>
       </div>
-    </div>
-    <div class="form-group mb-2">
-      <label for="{{ formPheflux.prefix_log_file.id_for_label }}">{{ formPheflux.prefix_log_file.label }}</label>
-      {{ formPheflux.prefix_log_file }}
-    </div>
-    <input type="hidden" name="form_type" value="formPheflux">
-    <button type="submit" class="btn btn-primary">Submit</button>
-  </form>
+    
+  </div>
+  
+</form>
+
 {% endif %}
 </div>
 {% endblock %}
