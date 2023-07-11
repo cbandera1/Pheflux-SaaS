@@ -5,5 +5,6 @@ app_name = 'Pheflux'
 
 urlpatterns = [
     path('', views.pheflux_prediction, name='pheflux'),
-
+    path('biggsearch', views.bigg_search, name='searchbigg'),
+    path('tcgasearch', views.tcga_search, name='searchtcga')
 ]
