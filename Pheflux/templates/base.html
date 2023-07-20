@@ -52,8 +52,18 @@
     
       {% block content %}
       {% endblock %}
-    
+
+      <script>
+        function mostrarSpinner() {
+            var form = document.getElementById('procesar-form');
+            form.style.display = 'none';
+      
+            var spinnerContainer = document.getElementById('spinner-container');
+            spinnerContainer.style.display = 'block';
+        }
+      </script>    
 </body>
+
 
   <!-- Footer -->
   <footer class="footer bg-dark w-100 py-3 position-absolute bottom-0 start-50 translate-middle-x text-center text-white">

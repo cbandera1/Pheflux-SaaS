@@ -6,9 +6,10 @@ import tempfile
 import requests
 import pdb
 import re
+import time
 from django.http import *
 from django.shortcuts import get_object_or_404
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .forms import *
 from .utils.pheflux import getFluxes
 
@@ -101,133 +102,28 @@ def pheflux_prediction(request):
                 response = HttpResponse(
                     buffer, content_type='application/octet-stream')
                 response['Content-Disposition'] = 'attachment; filename="results.zip"'
+                # Almacenar la respuesta en una variable de sesión para usarla después de la redirección
 
-                return response
-        # Caso en que se relize POST para realizar una busqueda con BiGG Models API
-        elif form_type == 'formSearchBiGG':
-            form = SearchBiGGForm(request.POST)
-            if form.is_valid():
-                # Se obtiene la query ingresada
-                query = form.cleaned_data['query']
-            # Se realiza la peticion a la base de datos que retorna en formato JSON al cual se le extraen los resultados como opciones
-                url = f'http://bigg.ucsd.edu/api/v2/search?query={query}&search_type=models'
-                results = requests.get(url).json()
-                options = extract_options(results)
-            # Se definen los formularios para ser pasados como conexto
-                formPheflux = PhefluxForm()
-                formSearchBiGG = SearchBiGGForm()
-                formSearchTCGA = SearchTCGAForm()
+                # Redireccionar a la misma vista (GET) después de procesar el formulario
 
-                context = {'options': options,
-                           'formPheflux': formPheflux,
-                           'formSearchBiGG': formSearchBiGG,
-                           'formSearchTCGA': formSearchTCGA
-                           }
-            # Renderiza nuevamente la vista ahora con los formularios y las opciones resultantes de la busqueda
-                return render(
-                    request,
-                    'pheflux_form.html',
-                    context
-                )
-        elif form_type == 'BiggModelDownload':
-            # Obtiene el valor de la seleccion entre las opciones disponibles
-            query = request.POST.get('query')
-        # Se realiza la peticion a la base de datos para hacer un request del archivo
-            url = f'http://bigg.ucsd.edu/static/models/{query}.xml'
-            response = requests.get(url)
-        # Caso de exito se crea un archivo .xml con el nombre del archivo y se le escribe la informacion
-            if response.status_code == 200:
+            context = {
+                'formPheflux': PhefluxForm(),  # Agrega el formulario a tu contexto
+                # Pasar la respuesta de descarga al contexto
+                'download_response': response,
+            }
 
-                # Se genera un archivo temporal para guardar los datos
-                file_name = f'{query}.xml'
-                BiGG_temp = tempfile.NamedTemporaryFile(delete=False)
-                Bigg_temp_route = BiGG_temp.name
-
-            # Guarda el contenido del archivo geneExp subido en el archivo temporal
-                with open(Bigg_temp_route, 'wb+') as destino:
-                    destino.write(response.content)
-                with open(Bigg_temp_route, 'rb') as archivo:
-                    contenido = archivo.read()
-                print("Archivo descargado exitosamente.")
-                response = HttpResponse(
-                    contenido, content_type='application/xml')
-                response['Content-Disposition'] = f'attachment; filename="{file_name}"'
-
-                return response
-
-        # Caso error
-            else:
-                print("Error al descargar el archivo:", response.status_code)
-        elif form_type == 'formSearchTCGA':
-            form = SearchTCGAForm(request.POST)
-            if form.is_valid():
-                files_endpt = "https://api.gdc.cancer.gov/files"
-                query = form.cleaned_data['query']
-                filters = {
-                    "op": "and",
-                    "content": [
-                        {
-                            "op": "in",
-                            "content": {
-                                "field": "cases.primary_site",
-                                "value": [query]
-                            }
-
-                        },
-                        {
-                            "op": "in",
-                            "content": {
-                                "field": "cases.project.program.name",
-                                "value": ["TCGA"]
-                            }
-                        },
-                        {
-                            "op": "in",
-                            "content": {
-                                "field": "files.data_type",
-                                "value": ["Gene Expression Quantification"]
-                            }
-                        }
-                        #     {
-                        #         "op": "in",
-                        #         "content": {
-                        #             "field": "files.analysis.workflow_type",
-                        #             "value": ["FM Copy Number Variation"]
-                        #         }
-                        #     }
-                    ]
-                }
-                params = {
-                    "filters": json.dumps(filters),
-                    "fields": "file_id",
-                    "format": "JSON",
-                    "size": "1"
-                }
-                response = requests.get(files_endpt, params=params)
-
-                file_entry = json.loads(
-                    response.content.decode("utf-8"))
-
-                file_uuid_list = []
-                for file_entry in json.loads(response.content.decode("utf-8"))["data"]["hits"]:
-                    file_uuid_list.append(file_entry["file_id"])
-
-                return download_file(file_uuid_list, query)
-
-    # Caso de que no sea una peticion POST renderiza los formularios
+            return render(request, 'pheflux_form.html', context)
     else:
         formPheflux = PhefluxForm()
         formSearchBiGG = SearchBiGGForm()
-        formSearchTCGA = SearchTCGAForm()
         context = {'formPheflux': formPheflux,
-                   'formSearchBiGG': formSearchBiGG,
-                   'formSearchTCGA': formSearchTCGA
-                   }
+                   'formSearchBiGG': formSearchBiGG}
         return render(
             request,
             'pheflux_form.html',
             context
         )
+    # Caso de que no sea una peticion POST renderiza los formularios
 
 
 def bigg_search(request):
@@ -327,14 +223,14 @@ def tcga_search(request):
                                 "field": "files.data_type",
                                 "value": ["Gene Expression Quantification"]
                             }
+                        },
+                        {
+                            "op": "in",
+                            "content": {
+                                "field": "files.analysis.workflow_type",
+                                "value": ["HTSeq - FPKM"]
+                            }
                         }
-                        #     {
-                        #         "op": "in",
-                        #         "content": {
-                        #             "field": "files.analysis.workflow_type",
-                        #             "value": ["FM Copy Number Variation"]
-                        #         }
-                        #     }
                     ]
                 }
                 params = {
