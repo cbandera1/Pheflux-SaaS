@@ -1,4 +1,5 @@
 import io
+import os
 import csv
 import json
 import zipfile
@@ -10,6 +11,7 @@ import time
 from django.http import *
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render, redirect
+from django.template import loader
 from .forms import *
 from .utils.pheflux import getFluxes
 
@@ -86,6 +88,7 @@ def pheflux_prediction(request):
             # Se crean las rutas del archivo de prediction y log
                 ruta_solve = f"{predictions[0]}/{predictions[1]}"
                 ruta_log = f"{predictions[0]}/{predictions[2]}"
+
             # Archivo ZIP en memoria
                 buffer = io.BytesIO()
                 with zipfile.ZipFile(buffer, 'w') as zip_file:
@@ -102,22 +105,13 @@ def pheflux_prediction(request):
                 response = HttpResponse(
                     buffer, content_type='application/octet-stream')
                 response['Content-Disposition'] = 'attachment; filename="results.zip"'
-                # Almacenar la respuesta en una variable de sesión para usarla después de la redirección
+                return response
 
-                # Redireccionar a la misma vista (GET) después de procesar el formulario
-
-            context = {
-                'formPheflux': PhefluxForm(),  # Agrega el formulario a tu contexto
-                # Pasar la respuesta de descarga al contexto
-                'download_response': response,
-            }
-
-            return render(request, 'pheflux_form.html', context)
     else:
         formPheflux = PhefluxForm()
-        formSearchBiGG = SearchBiGGForm()
+
         context = {'formPheflux': formPheflux,
-                   'formSearchBiGG': formSearchBiGG}
+                   }
         return render(
             request,
             'pheflux_form.html',
@@ -261,6 +255,11 @@ def tcga_search(request):
         )
 
 
+def download_predict(request):
+    return render(
+        request,
+        'download_predict.html'
+    )
 # Funcion para extraer las opciones resultantes de la busqueda en BiGG Model API
 
 

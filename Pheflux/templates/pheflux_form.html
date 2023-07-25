@@ -60,29 +60,18 @@
     
   </div>
   <input type="hidden" name="form_type" value="formPheflux">
-  <button id="procesar-btn" type="submit" class="btn btn-primary mt-2" onclick="mostrarSpinner()">Submit</button>
-
+  <button id="procesar-btn" type="submit" class="btn btn-primary mt-2" onclick="validarFormularioYMostrarSpinner()">Submit</button>
   
 </form>
-{% if download_response %}
-<a href="{{ download_response.url }}" download="results.zip" class="btn btn-success mt-2">Download Results</a>
-    {% endif %}
+
 <div id="spinner-container" style="display: none;">
   <div class="spinner-border" role="status">
       <span class="sr-only"></span>
   </div>
+  <a href= "http://127.0.0.1:8000/pheflux/" class="btn btn-success mt-2">Volver al inicio</a>
   
 </div>
 
 {% endif %}
 
 {% endblock %}
-<script>
-  function mostrarSpinner() {
-      var form = document.getElementById('procesar-form');
-      form.style.display = 'none';
-
-      var spinnerContainer = document.getElementById('spinner-container');
-      spinnerContainer.style.display = 'block';
-  }
-</script>
