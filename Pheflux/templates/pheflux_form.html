@@ -13,7 +13,7 @@
 <div class ="container text-center w-50 rounded mt-5 pb-1 border border-secondary " style="background-color: #f6f6f6;">
 <h2 class="">Pheflux</h2>
 {% if formPheflux %}
-<form id="procesar-form" method="post" enctype="multipart/form-data">
+<form id="procesar-form" method="post" enctype="multipart/form-data" onsubmit="event.preventDefault(); procesarFormulario();">
   {% csrf_token %}  
   <div class="form-group row mt-5 mb-2">
     <label for="{{ formPheflux.organism.id_for_label }}" class="col-md-4 text-md-right">{{ formPheflux.organism.label }}</label>
@@ -29,19 +29,19 @@
   </div>
   <div class="form-group row mb-2">
     <label for="{{ formPheflux.geneExp_file.id_for_label }}" class="col-md-4 text-md-right">{{ formPheflux.geneExp_file.label }}</label>
-    <div class="col-md-6 px-5">
+    <div class="col-md-6 mx-3">
       {{ formPheflux.geneExp_file }}
     </div>
   </div>
   <div class="form-group row mb-2">
     <label for="{{ formPheflux.medium_file.id_for_label }}" class="col-md-4 text-md-right">{{ formPheflux.medium_file.label }}</label>
-    <div class="col-md-6 px-5">
+    <div class="col-md-6 mx-3">
       {{ formPheflux.medium_file }}      
     </div>
   </div>
   <div class="form-group row mb-2">
     <label for="{{ formPheflux.network_file.id_for_label }}" class="col-md-4 text-md-right">{{ formPheflux.network_file.label }}</label>
-    <div class="col-md-6 px-5">
+    <div class="col-md-6 mx-3">
       {{ formPheflux.network_file }}
     </div>
   </div>
@@ -60,18 +60,93 @@
     
   </div>
   <input type="hidden" name="form_type" value="formPheflux">
-  <button id="procesar-btn" type="submit" class="btn btn-primary mt-2" onclick="validarFormularioYMostrarSpinner()">Submit</button>
+    <button id="submit-btn" type="submit" class="btn btn-primary mt-4">Submit</button>
   
 </form>
 
-<div id="spinner-container" style="display: none;">
-  <div class="spinner-border" role="status">
-      <span class="sr-only"></span>
-  </div>
-  <a href= "http://127.0.0.1:8000/pheflux/" class="btn btn-success mt-2">Volver al inicio</a>
-  
-</div>
+
 
 {% endif %}
+<div class="form-group row mt-3">
+  <div class="col-md-12">
+      <div class="text-center">
+          <!-- Elemento para mostrar el spinner -->
+          {% comment %} <div id="loading-spinner" class="spinner d-none"></div> {% endcomment %}
+          <div id="loading-spinner" style="" class="d-none" >
+            <div class="spinner-border" role="status">
+                <span class="sr-only"></span>
+            </div>
+      </div>
+  </div>
+</div>
+<script>
+  // Función para mostrar el spinner
+function mostrarSpinner() {
+var spinner = document.getElementById("loading-spinner");
+var button = document.getElementById("submit-btn");
+spinner.classList.remove("d-none"); // Mostrar el spinner
+button.classList.add("d-none");
+}
+
+// Función para ocultar el spinner
+function ocultarSpinner() {
+var spinner = document.getElementById("loading-spinner");
+var button = document.getElementById("submit-btn");
+spinner.classList.add("d-none"); // Ocultar el spinner
+button.classList.remove("d-none");
+}
+
+// Función para enviar el formulario y mostrar el spinner
+function procesarFormulario() {
+  // Evitar que el formulario se envíe directamente
+  event.preventDefault();
+
+  // Mostrar el spinner antes de enviar la petición
+  mostrarSpinner();
+
+  // Obtener el formulario y los datos
+  var form = document.getElementById("procesar-form");
+  var formData = new FormData(form);
+
+  // Realizar la petición AJAX al servidor Django
+  fetch('/pheflux/', {
+      method: 'POST',
+      body: formData,
+  })
+  .then(function(response) {
+    if (response.ok) {
+      // Manejar la respuesta del servidor cuando es exitosa
+      return response.blob(); // Convertir la respuesta a un objeto Blob
+    } else {
+      throw new Error('Error en la respuesta del servidor');
+    }
+  }) // <- Agregar paréntesis de cierre aquí
+  .then(function(blobData) {
+    // Crear un enlace para descargar el archivo ZIP
+    var url = URL.createObjectURL(blobData);
+    var link = document.createElement('a');
+    link.href = url;
+    link.download = 'results.zip';
+    document.body.appendChild(link);
+    link.click();
+
+    // Liberar los recursos del enlace
+    URL.revokeObjectURL(url);
+
+    ocultarSpinner(); // Ocultar el spinner después de manejar la respuesta
+  })
+  .catch(function(error) {
+    // Código para manejar el error (si corresponde)
+    // Por ejemplo, mostrar un mensaje de error en la página
+    // ...
+
+    ocultarSpinner(); // Asegurarse de ocultar el spinner también en caso de error
+  });
+}
+
+
+// Asignar la función procesarFormulario() al evento onsubmit del formulario
+document.getElementById("procesar-form").addEventListener("submit", procesarFormulario);
+</script>
 
 {% endblock %}

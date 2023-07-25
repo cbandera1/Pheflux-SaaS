@@ -15,9 +15,7 @@
     position: absolute;
     bottom: 0;
     width: 100%;
-  }
-  
-    
+  } 
 </style>
 
 </head>
@@ -54,25 +52,7 @@
       {% block content %}
       {% endblock %}
     
-      <script>
-        function validarFormularioYMostrarSpinner() {
-          var form = document.getElementById('procesar-form');
-          if (form.checkValidity()) {
-            var newTab = window.open('download', '_blank');
-        newTab.focus();
-          } else {
-            
-          }
-        }
-      
-        {% comment %} function mostrarSpinner() {
-          var form = document.getElementById('procesar-form');
-          form.style.display = 'none';
-      
-          var spinnerContainer = document.getElementById('spinner-container');
-          spinnerContainer.style.display = 'block';
-        } {% endcomment %}
-      </script>
+
         
 </body>
 
