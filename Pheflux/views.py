@@ -265,9 +265,9 @@ def download_predict(request):
 
 def extract_options(parsed_data):
     options = []
-    for elemento in parsed_data['results']:
-        for valor in elemento.values():
-            options.append(valor)
+    for element in parsed_data['results']:
+        for value in element.values():
+            options.append(value)
     return options
 
 

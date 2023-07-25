@@ -10,7 +10,7 @@
 
 
 {% block content %}
-<div class ="container text-center w-25 rounded mt-5 pb-1 border border-secondary " style="background-color: #f6f6f6;">
+<div class ="container text-center w-50 rounded mt-5 pb-1 border border-secondary " style="background-color: #f6f6f6;">
 <h2 class="">Pheflux</h2>
 {% if formPheflux %}
 <form id="procesar-form" method="post" enctype="multipart/form-data">
@@ -29,19 +29,19 @@
   </div>
   <div class="form-group row mb-2">
     <label for="{{ formPheflux.geneExp_file.id_for_label }}" class="col-md-4 text-md-right">{{ formPheflux.geneExp_file.label }}</label>
-    <div class="col-md-6">
+    <div class="col-md-6 px-5">
       {{ formPheflux.geneExp_file }}
     </div>
   </div>
   <div class="form-group row mb-2">
     <label for="{{ formPheflux.medium_file.id_for_label }}" class="col-md-4 text-md-right">{{ formPheflux.medium_file.label }}</label>
-    <div class="col-md-6">
+    <div class="col-md-6 px-5">
       {{ formPheflux.medium_file }}      
     </div>
   </div>
   <div class="form-group row mb-2">
     <label for="{{ formPheflux.network_file.id_for_label }}" class="col-md-4 text-md-right">{{ formPheflux.network_file.label }}</label>
-    <div class="col-md-6">
+    <div class="col-md-6 px-5">
       {{ formPheflux.network_file }}
     </div>
   </div>
