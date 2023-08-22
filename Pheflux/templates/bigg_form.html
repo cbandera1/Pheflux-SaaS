@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class ="container text-center w-25 rounded mt-5 pb-5 border border-secondary ">
+  <form method="post">
+      {% csrf_token %}
+      <div class="form-group ">
+        <div class= "mt-5">
+        {{ formSearchBiGG.label_tag }}
+      </div>
+        {{ formSearchBiGG }}
+      </div>
+      <input type="hidden" name="form_type" value="formSearchBiGG">
+      <button type="submit" class="btn btn-primary mt-2">Search</button>
+      
+    </form> 
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-6">
+    <form method="post">
+      {% csrf_token %}
+      <ul class="list-unstyled">
+        {% for item in options %}
+          <li>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="query" value="{{ item }}">
+              <label class="form-check-label">{{ item }}</label>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+      {% if options %}
+        <input type="hidden" name="form_type" value="BiggModelDownload">
+        <button type="submit" class="btn btn-primary mt-2 ">Search</button>
+      {% endif %}
+    </form>
+  </div>
+  </div>
+  </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

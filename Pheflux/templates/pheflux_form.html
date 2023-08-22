@@ -1,15 +1,179 @@
+{% extends 'base.html' %}
+
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/spin.js/4.1.0/spin.min.js"></script>
+<style>
+  body, html {
+    height: 100%;
+    margin: 0;
+  }
+
+  #loading-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.7);
+    z-index: 9999;
+    visibility: hidden;
+  }
+
+  #loading-spinner.active {
+    visibility: visible;
+  }
+</style>
+
+
+
+</head>
+
+
 {% block content %}
-  <h2>Formulario Pheflux</h2>
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ formPheflux.as_p }}
-    <input type="hidden" name="form_type" value="formPheflux">
-    <button type="submit">Enviar</button>
-  </form>
-  <form method="post">
-    {% csrf_token %}
-    {{ formSearchBiGG.as_p }}
-    <input type="hidden" name="form_type" value="formSearchBiGG">
-    <button type="submit">Search</button>
+<div class ="container text-center w-50 rounded mt-5 pb-1 border border-secondary " style="background-color: #f6f6f6;">
+<h2 class="">Pheflux</h2>
+{% if formPheflux %}
+<form id="procesar-form" method="post" enctype="multipart/form-data" onsubmit="event.preventDefault();">
+  {% csrf_token %}  
+  <div class="form-group row mt-5 mb-2">
+    <label for="{{ formPheflux.organism.id_for_label }}" class="col-md-4 text-md-right">{{ formPheflux.organism.label }}</label>
+    <div class="col-md-6">
+      {{ formPheflux.organism }}
+    </div>
+  </div>
+  <div class="form-group row mb-2">
+    <label for="{{ formPheflux.condition.id_for_label }}" class="col-md-4 text-md-right">{{ formPheflux.condition.label }}</label>
+    <div class="col-md-6">
+      {{ formPheflux.condition }}
+    </div>
+  </div>
+  <div class="form-group row mb-2">
+    <label for="{{ formPheflux.geneExp_file.id_for_label }}" class="col-md-4 text-md-right">{{ formPheflux.geneExp_file.label }}</label>
+    <div class="col-md-6 mx-3">
+      {{ formPheflux.geneExp_file }}
+    </div>
+  </div>
+  <div class="form-group row mb-2">
+    <label for="{{ formPheflux.medium_file.id_for_label }}" class="col-md-4 text-md-right">{{ formPheflux.medium_file.label }}</label>
+    <div class="col-md-6 mx-3">
+      {{ formPheflux.medium_file }}      
+    </div>
+  </div>
+  <div class="form-group row mb-2">
+    <label for="{{ formPheflux.network_file.id_for_label }}" class="col-md-4 text-md-right">{{ formPheflux.network_file.label }}</label>
+    <div class="col-md-6 mx-3">
+      {{ formPheflux.network_file }}
+    </div>
+  </div>
+  <div class="form-group row mb-2">
+    <label for="{{ formPheflux.prefix_log_file.id_for_label }}" class="col-md-4 text-md-right">{{ formPheflux.prefix_log_file.label }}</label>
+    <div class="col-md-6">
+      {{ formPheflux.prefix_log_file }}
+    </div>
+  </div>
+  
+    <div class="">
+      <div class="form-check">
+        {{ formPheflux.verbosity }}
+        <label class="form-check-label" for="{{ formPheflux.verbosity.id_for_label }}">{{ formPheflux.verbosity.label }}</label>
+      </div>
+    
+  </div>
+  <input type="hidden" name="form_type" value="formPheflux">
+    <button id="submit-btn" type="submit" class="btn btn-primary mt-4">Submit</button>
+  
 </form>
+
+
+
+{% endif %}
+<div class="form-group row mt-3">
+  <div class="col-md-12">
+    <div class="text-center">
+      <div id="loading-spinner" class="d-none">
+        <div class="spinner-border pb-5" role="status" style="width: 5rem; height: 5rem;">
+          <span class="sr-only"></span>
+        </div>
+        <br>
+        <h6>We are currently processing the data. The download will start as soon as the prediction is ready.</h6>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Función para mostrar el spinner
+function mostrarSpinner() {
+var spinner = document.getElementById("loading-spinner");
+var button = document.getElementById("submit-btn");
+spinner.classList.remove("d-none"); // Mostrar el spinner
+button.classList.add("d-none");
+}
+
+// Función para ocultar el spinner
+function ocultarSpinner() {
+var spinner = document.getElementById("loading-spinner");
+var button = document.getElementById("submit-btn");
+spinner.classList.add("d-none"); // Ocultar el spinner
+button.classList.remove("d-none");
+}
+
+// Función para enviar el formulario y mostrar el spinner
+function procesarFormulario() {
+  // Evitar que el formulario se envíe directamente
+  event.preventDefault();
+
+  // Mostrar el spinner antes de enviar la petición
+  mostrarSpinner();
+
+  // Obtener el formulario y los datos
+  var form = document.getElementById("procesar-form");
+  var formData = new FormData(form);
+
+  // Realizar la petición AJAX al servidor Django
+  fetch('/pheflux/', {
+      method: 'POST',
+      body: formData,
+  })
+  .then(function(response) {
+    if (response.ok) {
+      // Manejar la respuesta del servidor cuando es exitosa
+      return response.blob(); // Convertir la respuesta a un objeto Blob
+    } else {
+      throw new Error('Error en la respuesta del servidor');
+    }
+  }) // <- Agregar paréntesis de cierre aquí
+  .then(function(blobData) {
+    // Crear un enlace para descargar el archivo ZIP
+    var url = URL.createObjectURL(blobData);
+    var link = document.createElement('a');
+    link.href = url;
+    link.download = 'results.zip';
+    document.body.appendChild(link);
+    link.click();
+
+    // Liberar los recursos del enlace
+    URL.revokeObjectURL(url);
+
+    ocultarSpinner(); // Ocultar el spinner después de manejar la respuesta
+  })
+  .catch(function(error) {
+    // Código para manejar el error (si corresponde)
+    // Por ejemplo, mostrar un mensaje de error en la página
+    // ...
+
+    ocultarSpinner(); // Asegurarse de ocultar el spinner también en caso de error
+  });
+}
+
+
+// Asignar la función procesarFormulario() al evento onsubmit del formulario
+document.getElementById("procesar-form").addEventListener("submit", procesarFormulario);
+</script>
+
 {% endblock %}
