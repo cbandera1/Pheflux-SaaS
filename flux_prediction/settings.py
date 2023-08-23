@@ -42,6 +42,31 @@ INSTALLED_APPS = [
     'bootstrap4',
     'crispy_forms',
     'crispy_bootstrap4',
+    'corsheaders'
+]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # Cambia esto al dominio de tu frontend
+    "http://127.0.0.1:3000",  # También puedes agregar más orígenes
+]
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+    'PUT',
+    'PATCH',
+    'DELETE',
+    'OPTIONS'
+]
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with'
 ]
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
@@ -53,6 +78,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'flux_prediction.urls'
@@ -83,7 +109,7 @@ WSGI_APPLICATION = 'flux_prediction.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'database',
+        'NAME': 'phefluxdb',
         'USER': 'cbandera',
         'PASSWORD': 'cbandera',
         'HOST': 'localhost',  # Replace with your PostgreSQL server's address if necessary
