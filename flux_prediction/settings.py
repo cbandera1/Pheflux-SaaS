@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'bootstrap4',
     'crispy_forms',
     'crispy_bootstrap4',
-    'corsheaders'
+    'corsheaders',
+    'rest_framework',
 ]
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # Cambia esto al dominio de tu frontend
