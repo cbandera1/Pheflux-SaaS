@@ -13,7 +13,7 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import render, redirect
 from django.template import loader
 from .forms import *
-from .utils.pheflux import getFluxes
+from .utils.pheflux import getFluxes, AlgorithmStepError
 
 
 # Create your views here.
@@ -83,8 +83,14 @@ def pheflux_prediction(request):
                 prefix_log = request.POST["prefix_log_file"]
                 verbosity = request.POST["verbosity"]
             # Se inicia la ejecucion del algoritmo con el input.csv generado, los datos de prefix_log y verbosity
-                predictions = getFluxes(
-                    "Pheflux/utils/input.csv", prefix_log, verbosity)
+                try:    
+                    predictions = getFluxes(
+                        "Pheflux/utils/input.csv", prefix_log, verbosity)
+                except AlgorithmStepError as e:
+                # Identificar en qué paso ocurrió el error y mostrar un mensaje adecuado
+                    step = e.step
+                    message = e.args[0]  # Obtener la descripción del error
+                    return HttpResponse(f"Error en {step}: {message}", status=500)
             # Se crean las rutas del archivo de prediction y log
                 ruta_solve = f"{predictions[0]}/{predictions[1]}"
                 ruta_log = f"{predictions[0]}/{predictions[2]}"
@@ -98,33 +104,34 @@ def pheflux_prediction(request):
                     zip_file.write(ruta_log, f"{predictions[2]}")
 
             # Volver al inicio del archivo ZIP
-                buffer.seek(0)
+                    buffer.seek(0)
 
             # Crear una respuesta HTTP con el archivo ZIP
                 response = HttpResponse(
                     buffer, content_type='application/octet-stream')
                 response['Content-Disposition'] = 'attachment; filename="results.zip"'
                 # Almacenar la respuesta en una variable de sesión para usarla después de la redirección
-                return response
-               # Redireccionar a la misma vista (GET) después de procesar el formulario
+                # Redireccionar a la misma vista (GET) después de procesar el formulario
 
-            context = {
-                'formPheflux': PhefluxForm(),  # Agrega el formulario a tu contexto
-                # Pasar la respuesta de descarga al contexto
-                'download_response': response,
-            }
+                context = {
+                        'formPheflux': PhefluxForm(),  # Agrega el formulario a tu contexto
+                        # Pasar la respuesta de descarga al contexto
+                        'download_response': response,
+                    }
 
-            return render(request, 'pheflux_form.html', context)
+                return render(request, 'pheflux_form.html', context)
+            else: 
+                return HttpResponse(f"El formulario tiene errores", status=500)
     else:
         formPheflux = PhefluxForm()
         formSearchBiGG = SearchBiGGForm()
         context = {'formPheflux': formPheflux,
-                   'formSearchBiGG': formSearchBiGG}
+                'formSearchBiGG': formSearchBiGG}
         return render(
-            request,
-            'pheflux_form.html',
-            context
-        )
+                request,
+                'pheflux_form.html',
+                context
+            )
     # Caso de que no sea una peticion POST renderiza los formularios
 
 

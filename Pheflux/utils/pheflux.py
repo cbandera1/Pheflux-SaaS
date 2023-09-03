@@ -377,6 +377,11 @@ def actuallyTime():
         " "+str(now.hour)+":"+str(now.minute)+":"+str(now.second)+"]"
     return (actuallyTime)
 
+class AlgorithmStepError(Exception):
+    def __init__(self, step, message):
+        super().__init__(message)
+        self.step = step
+
 
 #################################################################################
 ########################             PHEFLUX             ########################
@@ -392,92 +397,99 @@ def getFluxes(inputFileName, prefix_log, verbosity):
     shuffledFPKM = pd.DataFrame()
     #################################################################################
     # Load "InputData" file
-    inputData = pd.read_csv(inputFileName, sep="\t",
-                            lineterminator='\n', na_filter=False)
-    nRows, nCols = inputData.shape
+    try:
+        inputData = pd.read_csv(inputFileName, sep="\t",
+                                    lineterminator='\n', na_filter=False)
+        nRows, nCols = inputData.shape        
+        shuffle = False
+        opt_time, t_time = [], []
+        for i in range(nRows):
+            ##############################################################
+            # Load information from InputData
+            condition = inputData.loc[i]["Condition"]
+            geneExpFile = inputData.loc[i]["GeneExpFile"]
+            mediumFile = inputData.loc[i]["Medium"]
+            network = inputData.loc[i]["Network"]
+            organism = inputData.loc[i]["Organism"]
+            if pd.isnull(condition) or pd.isnull(geneExpFile) or pd.isnull(mediumFile) or pd.isnull(network) or pd.isnull(organism):
+                raise AlgorithmStepError("Paso 1", "Uno o más archivos no son válidos")
 
-    shuffle = False
-    opt_time, t_time = [], []
-    for i in range(nRows):
-        ##############################################################
-        # Load information from InputData
-        condition = inputData.loc[i]["Condition"]
-        geneExpFile = inputData.loc[i]["GeneExpFile"]
-        mediumFile = inputData.loc[i]["Medium"]
-        network = inputData.loc[i]["Network"]
-        organism = inputData.loc[i]["Organism"]
 
-        ##############################################################
-        # Messages in terminal
+            ##############################################################
+            # Messages in terminal
+            atime = actuallyTime()
+            print(atime, 'Condition ejecuted:', organism, '-', condition)
+
+            ##############################################################
+            # Metabolic network
+            if verbosity:
+                atime = actuallyTime()
+                print(atime, "Loading metabolic model:",
+                    network.split("/")[-1].split(".")[0])
+            model_default = cobra.io.read_sbml_model(network)
+            fpkm = pd.read_csv(geneExpFile, sep="\t", lineterminator='\n')
+            init_time = time.time()
+            ##############################################################
+            # FPKM data
+            if verbosity:
+                atime = actuallyTime()
+                print(atime, "Loading transcriptomic data...")
+            # Load FPKM data
+            fpkmDic, shuffledFPKM = loadFPKM(
+                fpkm, condition, shuffle, shuffledFPKM)
+    except Exception as e:
+        raise AlgorithmStepError("Paso 2", "Formato incorrecto archivo de información transcriptomica")
+    # Reload FPKM data for Hsapiens and load culture medium
+    if organism == 'Homo_sapiens':
+        fpkmDic = reloadFPKMHsapiens(fpkmDic, model_default)
+
+    ##############################################################
+    # Update model: Add R_, open bounds, and set carbon source
+    if verbosity:
         atime = actuallyTime()
-        print(atime, 'Condition ejecuted:', organism, '-', condition)
-
-        ##############################################################
-        # Metabolic network
-        if verbosity:
-            atime = actuallyTime()
-            print(atime, "Loading metabolic model:",
-                  network.split("/")[-1].split(".")[0])
-        model_default = cobra.io.read_sbml_model(network)
-        fpkm = pd.read_csv(geneExpFile, sep="\t", lineterminator='\n')
-
-        init_time = time.time()
-        ##############################################################
-        # FPKM data
-        if verbosity:
-            atime = actuallyTime()
-            print(atime, "Loading transcriptomic data...")
-        # Load FPKM data
-        fpkmDic, shuffledFPKM = loadFPKM(
-            fpkm, condition, shuffle, shuffledFPKM)
-        # Reload FPKM data for Hsapiens and load culture medium
-        if organism == 'Homo_sapiens':
-            fpkmDic = reloadFPKMHsapiens(fpkmDic, model_default)
-
-        ##############################################################
-        # Update model: Add R_, open bounds, and set carbon source
-        if verbosity:
-            atime = actuallyTime()
-            print(atime, "Updating metabolic model...")
+        print(atime, "Updating metabolic model...")
+    try:
         model = updateModel(model_default, mediumFile)
+    except Exception as e:
+        raise AlgorithmStepError("Paso 3", "Formato incorrecto archivo de medio")    
 
-        ##############################################################
-        # Compute flux predictions
-        if verbosity:
-            atime = actuallyTime()
-            print(atime, "Running pheflux...")
-        k = 1000
-        fluxes, optimization_time, total_time, status, success, lbx, ubx = optPheFlux(
-            model, fpkmDic, k, init_time)
-
-        ##############################################################
-        # Save results: fluxes and summary table
-        print(" ")
-        if verbosity:
-            atime = actuallyTime()
-            print(atime, "Saving metabolic fluxes...")
-        # fluxes
-        # Crea ruta temporal
-        result_temp = tempfile.TemporaryDirectory()
-        # Obtiene ruta temporal
-        result_temp_route = os.path.dirname(result_temp.name)
-        # Construye una ruta de archivo en la ruta temporal
-        resultsFile = os.path.join(
-            result_temp_route, f"{organism}_{condition}_{status}.fluxes.csv")
-        # Guarda el data grame en la ruta creada
-        fluxes.to_csv(resultsFile, sep='\t')
-
-        # summary table
-        record = recordTable(record, condition, lbx, ubx, total_time, status)
-
-        ##############################################################
-        # Messages in terminal
-        opt_time.append(optimization_time)
-        t_time.append(total_time)
+    ##############################################################
+    # Compute flux predictions
+    if verbosity:
         atime = actuallyTime()
-        print(atime, organism, '-', condition, "... is processed.")
+        print(atime, "Running pheflux...")
+    k = 1000
+    fluxes, optimization_time, total_time, status, success, lbx, ubx = optPheFlux(
+        model, fpkmDic, k, init_time)
 
-        print('\n', ' o '.center(80, '='), '\n')
+    ##############################################################
+    # Save results: fluxes and summary table
+    print(" ")
+    if verbosity:
+        atime = actuallyTime()
+        print(atime, "Saving metabolic fluxes...")
+    # fluxes
+    # Crea ruta temporal
+    result_temp = tempfile.TemporaryDirectory()
+    # Obtiene ruta temporal
+    result_temp_route = os.path.dirname(result_temp.name)
+    # Construye una ruta de archivo en la ruta temporal
+    resultsFile = os.path.join(
+        result_temp_route, f"{organism}_{condition}_{status}.fluxes.csv")
+    # Guarda el data grame en la ruta creada
+    fluxes.to_csv(resultsFile, sep='\t')
+
+    # summary table
+    record = recordTable(record, condition, lbx, ubx, total_time, status)
+
+    ##############################################################
+    # Messages in terminal
+    opt_time.append(optimization_time)
+    t_time.append(total_time)
+    atime = actuallyTime()
+    print(atime, organism, '-', condition, "... is processed.")
+
+    print('\n', ' o '.center(80, '='), '\n')
 
     ##############################################################
     # Save summary table
@@ -494,8 +506,8 @@ def getFluxes(inputFileName, prefix_log, verbosity):
     print('Average time per optimization:', np.mean(opt_time), 's')
     print('Average time per condition:', np.mean(t_time), 's')
     print('Total process time:', processTime/60,
-          'min', '--> ~', (processTime/3600), 'h')
+        'min', '--> ~', (processTime/3600), 'h')
 
     resultados = [result_temp_route, f"{organism}_{condition}_{status}.fluxes.csv",
-                  f"{prefix_log}_record_{code.upper()}.log.csv"]
+                f"{prefix_log}_record_{code.upper()}.log.csv"]
     return (resultados)

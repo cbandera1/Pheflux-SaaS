@@ -15,22 +15,22 @@ class PhefluxForm(forms.Form):
 
     def clean_geneExp_file(self):
         geneExp_file = self.cleaned_data.get('geneExp_file')
-        if not geneExp_file.name.endswith('.csv') and geneExp_file.name.endswith('.fpmk') and geneExp_file.name.endswith('.txt'):
+        if not geneExp_file.name.endswith('.csv') or geneExp_file.name.endswith('.fpmk') or geneExp_file.name.endswith('.txt'):
             raise forms.ValidationError("El archivo debe ser en formato CSV.")
         return geneExp_file
 
     def clean_medium_file(self):
         medium_file = self.cleaned_data.get('medium_file')
         print(medium_file)
-        if not medium_file.name.endswith('.fpmk') and medium_file.name.endswith('.txt') and medium_file.name.endswith('.xml'):
+        if not medium_file.name.endswith('.fpmk') or medium_file.name.endswith('.txt') or medium_file.name.endswith('.xml'):
             raise forms.ValidationError("El archivo debe ser en formato FPMK.")
         return medium_file
 
     def clean_network_file(self):
-        medium_file = self.cleaned_data.get('network_file')
-        if not medium_file.name.endswith('.xml'):
+        network_file = self.cleaned_data.get('network_file')
+        if not network_file.name.endswith('.xml'):
             raise forms.ValidationError("El archivo debe ser en formato xml.")
-        return medium_file
+        return network_file
 
 
 class SearchBiGGForm(forms.Form):
