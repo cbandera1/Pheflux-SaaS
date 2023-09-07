@@ -91,10 +91,6 @@ def pheflux_prediction(request):
                     step = e.step
                     message = e.args[0]  # Obtener la descripción del error
                     return HttpResponse(f"Error en {step}: {message}", status=500)
-                # if error_message is not None:
-                #     data = {'error_message': error_message}
-                #     print(data)
-                #     return JsonResponse(data)
             # Se crean las rutas del archivo de prediction y log
                 ruta_solve = f"{predictions[0]}/{predictions[1]}"
                 ruta_log = f"{predictions[0]}/{predictions[2]}"
@@ -108,7 +104,7 @@ def pheflux_prediction(request):
                     zip_file.write(ruta_log, f"{predictions[2]}")
 
             # Volver al inicio del archivo ZIP
-                    buffer.seek(0)
+                buffer.seek(0)
 
             # Crear una respuesta HTTP con el archivo ZIP
                 response = HttpResponse(
@@ -116,16 +112,15 @@ def pheflux_prediction(request):
                 response['Content-Disposition'] = 'attachment; filename="results.zip"'
                 # Almacenar la respuesta en una variable de sesión para usarla después de la redirección
                 # Redireccionar a la misma vista (GET) después de procesar el formulario
+                return response
+            # Aqui en vez de un return render deberia retornar el error de formulario
+            else:
+                form_errors = form.errors
+                return HttpResponse(f"{form.errors}", status=500)
 
-                context = {
-                        'formPheflux': PhefluxForm(),  # Agrega el formulario a tu contexto
-                        # Pasar la respuesta de descarga al contexto
-                        'download_response': response,
-                    }
-
-                return render(request, 'pheflux_form.html', context)
-            else: 
-                return HttpResponse(f"El formulario tiene errores de formato", status=500)
+            
+        else: 
+            return HttpResponse(f"El formulario tiene errores de formato", status=500)
     else:
         formPheflux = PhefluxForm()
         formSearchBiGG = SearchBiGGForm()
