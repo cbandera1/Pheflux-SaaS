@@ -429,29 +429,32 @@ def getFluxes(inputFileName, prefix_log, verbosity):
             model_default = cobra.io.read_sbml_model(network)
             fpkm = pd.read_csv(geneExpFile, sep="\t", lineterminator='\n')
             init_time = time.time()
+    except Exception as e:
+            raise AlgorithmStepError("Paso 2", "Formato incorrecto archivo Network")
             ##############################################################
             # FPKM data
+    try:
             if verbosity:
                 atime = actuallyTime()
-                print(atime, "Loading transcriptomic data...")
+            print(atime, "Loading transcriptomic data...")
             # Load FPKM data
             fpkmDic, shuffledFPKM = loadFPKM(
                 fpkm, condition, shuffle, shuffledFPKM)
+            # Reload FPKM data for Hsapiens and load culture medium
+            if organism == 'Homo_sapiens':
+                fpkmDic = reloadFPKMHsapiens(fpkmDic, model_default)
     except Exception as e:
-        raise AlgorithmStepError("Paso 2", "Formato incorrecto archivo de información transcriptomica")
-    # Reload FPKM data for Hsapiens and load culture medium
-    if organism == 'Homo_sapiens':
-        fpkmDic = reloadFPKMHsapiens(fpkmDic, model_default)
+        raise AlgorithmStepError("Paso 3", "Formato incorrecto archivo de información transcriptomica")
 
     ##############################################################
     # Update model: Add R_, open bounds, and set carbon source
-    if verbosity:
-        atime = actuallyTime()
-        print(atime, "Updating metabolic model...")
     try:
+        if verbosity:
+            atime = actuallyTime()
+        print(atime, "Updating metabolic model...")
         model = updateModel(model_default, mediumFile)
     except Exception as e:
-        raise AlgorithmStepError("Paso 3", "Formato incorrecto archivo de medio")    
+        raise AlgorithmStepError("Paso 4", "Formato incorrecto archivo de medio")    
 
     ##############################################################
     # Compute flux predictions

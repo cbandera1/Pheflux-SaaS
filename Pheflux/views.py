@@ -87,10 +87,14 @@ def pheflux_prediction(request):
                     predictions = getFluxes(
                         "Pheflux/utils/input.csv", prefix_log, verbosity)
                 except AlgorithmStepError as e:
-                # Identificar en qué paso ocurrió el error y mostrar un mensaje adecuado
+                    # Identificar en qué paso ocurrió el error y obtener el mensaje de error
                     step = e.step
                     message = e.args[0]  # Obtener la descripción del error
                     return HttpResponse(f"Error en {step}: {message}", status=500)
+                # if error_message is not None:
+                #     data = {'error_message': error_message}
+                #     print(data)
+                #     return JsonResponse(data)
             # Se crean las rutas del archivo de prediction y log
                 ruta_solve = f"{predictions[0]}/{predictions[1]}"
                 ruta_log = f"{predictions[0]}/{predictions[2]}"
@@ -121,7 +125,7 @@ def pheflux_prediction(request):
 
                 return render(request, 'pheflux_form.html', context)
             else: 
-                return HttpResponse(f"El formulario tiene errores", status=500)
+                return HttpResponse(f"El formulario tiene errores de formato", status=500)
     else:
         formPheflux = PhefluxForm()
         formSearchBiGG = SearchBiGGForm()
@@ -312,3 +316,14 @@ def download_file(file_uuid_list, query):
     else:
         print("Error al descargar el archivo:", response.status_code)
         return file_name
+
+def get_error_message(request):
+    # Obtén el mensaje de error de algún lugar (por ejemplo, de una variable de sesión)
+    error_message = request.session.get('error_message')
+    
+    if error_message:
+        # Borra el mensaje de error de la sesión después de obtenerlo
+        del request.session['error_message']
+        
+    data = {'error_message': error_message}
+    return JsonResponse(data)

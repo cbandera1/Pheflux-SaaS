@@ -15,14 +15,15 @@ class PhefluxForm(forms.Form):
 
     def clean_geneExp_file(self):
         geneExp_file = self.cleaned_data.get('geneExp_file')
-        if not geneExp_file.name.endswith('.csv') or geneExp_file.name.endswith('.fpmk') or geneExp_file.name.endswith('.txt'):
+        valid_extensions = ['.csv', '.fpmk', '.txt']
+        if not any(geneExp_file.name.endswith(ext) for ext in valid_extensions):
             raise forms.ValidationError("El archivo debe ser en formato CSV.")
         return geneExp_file
 
     def clean_medium_file(self):
         medium_file = self.cleaned_data.get('medium_file')
-        print(medium_file)
-        if not medium_file.name.endswith('.fpmk') or medium_file.name.endswith('.txt') or medium_file.name.endswith('.xml'):
+        valid_extensions = ['.fpmk', '.txt', '.xml', '.csv']
+        if not any(medium_file.name.endswith(ext) for ext in valid_extensions):
             raise forms.ValidationError("El archivo debe ser en formato FPMK.")
         return medium_file
 
