@@ -17,20 +17,20 @@ class PhefluxForm(forms.Form):
         geneExp_file = self.cleaned_data.get('geneExp_file')
         valid_extensions = ['.csv', '.fpmk', '.txt']
         if not any(geneExp_file.name.endswith(ext) for ext in valid_extensions):
-            raise forms.ValidationError("El archivo debe ser en formato CSV.")
+            raise forms.ValidationError("The geneExp file must have csv, fpmk or txt extension")
         return geneExp_file
 
     def clean_medium_file(self):
         medium_file = self.cleaned_data.get('medium_file')
         valid_extensions = ['.fpmk', '.txt', '.xml', '.csv']
         if not any(medium_file.name.endswith(ext) for ext in valid_extensions):
-            raise forms.ValidationError("El archivo debe ser en formato FPMK.")
+            raise forms.ValidationError("The medium file must have fpmk, txt, xml or csv extension")
         return medium_file
 
     def clean_network_file(self):
         network_file = self.cleaned_data.get('network_file')
         if not network_file.name.endswith('.xml'):
-            raise forms.ValidationError("El archivo debe ser en formato xml.")
+            raise forms.ValidationError("The network file must have xml extension")
         return network_file
 
 

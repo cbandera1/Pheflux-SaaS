@@ -88,7 +88,7 @@
     <button id="submit-btn" type="submit" class="btn btn-primary mt-4">Submit</button>
   
 </form>
-<div id="error-message" style="color: red;"></div>
+
 
 
 {% endif %}
@@ -105,15 +105,13 @@
     </div>
   </div>
 </div>
-<!-- 
-{% if error_message %}
-<div class="alert alert-danger alert-dismissible fade show" role="alert">
-  <strong>Error:</strong> {{ error_message }}
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-  </button>
+
+<div id="error-message" class="alert alert-danger" style="display: none;">
+  <!-- Aquí se mostrará el mensaje de error -->
 </div>
-{% endif %} -->
+<div id="success-message" class="alert alert-success" style="display: none;">
+  The data has been processed, the download will start shortly.
+</div>
 
 
 
@@ -156,13 +154,19 @@ function procesarFormulario() {
   })
   .then(function(response) {
     if (response.ok) {
-      // Manejar la respuesta del servidor cuando es exitosa
+      const succesDiv = document.getElementById('success-message');
+      succesDiv.style.display = 'block';
       return response.blob(); // Convertir la respuesta a un objeto Blob
     } else {
-      throw new Error('Error en la respuesta del servidor');
+      return response.json();
     }
-  }) // <- Agregar paréntesis de cierre aquí
-  .then(function(blobData) {
+  }).then(function(data) {
+  if (data.error_message) {
+    // Si la JsonResponse contiene un mensaje de error, mostrarlo
+    mostrarError(data.error_message);
+  } else {
+    // Si no hay error, continuar manejando la respuesta como de costumbre
+    var blobData = data; // Considerar la respuesta como Blob
     // Crear un enlace para descargar el archivo ZIP
     var url = URL.createObjectURL(blobData);
     var link = document.createElement('a');
@@ -173,14 +177,22 @@ function procesarFormulario() {
 
     // Liberar los recursos del enlace
     URL.revokeObjectURL(url);
+  }
 
-    ocultarSpinner(); // Ocultar el spinner después de manejar la respuesta
-  })
+  ocultarSpinner(); // Ocultar el spinner después de manejar la respuesta
+})
+.catch(function(error) {
+  // Código para manejar el error (si corresponde)
+  // Por ejemplo, mostrar un mensaje de error en la página
+  mostrarError('Error en la respuesta del servidor');
+  ocultarSpinner(); // Asegurarse de ocultar el spinner también en caso de error
+}) // <- Agregar paréntesis de cierre aquí
+
   .catch(function(error) {
     // Código para manejar el error (si corresponde)
     // Por ejemplo, mostrar un mensaje de error en la página
     // ...
-
+    mostrarError(error.message);
     ocultarSpinner(); // Asegurarse de ocultar el spinner también en caso de error
   });
 }
@@ -189,20 +201,19 @@ function procesarFormulario() {
 // Asignar la función procesarFormulario() al evento onsubmit del formulario
 document.getElementById("procesar-form").addEventListener("submit", procesarFormulario);
 
-$(document).ready(function() {
-        // Función para cargar el mensaje de error
-        function loadErrorMessage() {
-            $.get('/pheflux/', function(data) {
-                if (data.error_message) {
-                    // Mostrar el mensaje de error en el elemento con id "error-message"
-                    $('#error-message').text(data.error_message);
-                }
-            });
-        }
+function mostrarError(message) {
+    console.log('Mostrando error', message);
+    const errorDiv = document.getElementById('error-message');
+    errorDiv.textContent = message;
+    errorDiv.style.display = 'block';
+}
 
-        // Llamar a la función para cargar el mensaje de error cuando la página se carga
-        loadErrorMessage();
-      });
+// Función para ocultar el mensaje de error
+function ocultarError() {
+    const errorDiv = document.getElementById('error-message');
+    errorDiv.textContent = '';
+    errorDiv.style.display = 'none';
+}
 </script>
 
 {% endblock %}

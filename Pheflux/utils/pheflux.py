@@ -412,7 +412,7 @@ def getFluxes(inputFileName, prefix_log, verbosity):
             network = inputData.loc[i]["Network"]
             organism = inputData.loc[i]["Organism"]
             if pd.isnull(condition) or pd.isnull(geneExpFile) or pd.isnull(mediumFile) or pd.isnull(network) or pd.isnull(organism):
-                raise AlgorithmStepError("Paso 1", "Uno o más archivos no son válidos")
+                raise AlgorithmStepError("Step 1", "One or more files are not valid.")
 
 
             ##############################################################
@@ -430,7 +430,7 @@ def getFluxes(inputFileName, prefix_log, verbosity):
             fpkm = pd.read_csv(geneExpFile, sep="\t", lineterminator='\n')
             init_time = time.time()
     except Exception as e:
-            raise AlgorithmStepError("Paso 2", "Formato incorrecto archivo Network")
+            raise AlgorithmStepError("Step 2", "Incorrect Network File Format.")
             ##############################################################
             # FPKM data
     try:
@@ -444,7 +444,7 @@ def getFluxes(inputFileName, prefix_log, verbosity):
             if organism == 'Homo_sapiens':
                 fpkmDic = reloadFPKMHsapiens(fpkmDic, model_default)
     except Exception as e:
-        raise AlgorithmStepError("Paso 3", "Formato incorrecto archivo de información transcriptomica")
+        raise AlgorithmStepError("Step 3", "Incorrect Transcriptomic Information File Format.")
 
     ##############################################################
     # Update model: Add R_, open bounds, and set carbon source
@@ -454,7 +454,7 @@ def getFluxes(inputFileName, prefix_log, verbosity):
         print(atime, "Updating metabolic model...")
         model = updateModel(model_default, mediumFile)
     except Exception as e:
-        raise AlgorithmStepError("Paso 4", "Formato incorrecto archivo de medio")    
+        raise AlgorithmStepError("Step 4", "Incorrect Medium File Format.")    
 
     ##############################################################
     # Compute flux predictions
