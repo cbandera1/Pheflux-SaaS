@@ -13,7 +13,7 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import render, redirect
 from django.template import loader
 from .forms import *
-from .utils.pheflux import getFluxes
+from .utils.pheflux import getFluxes, AlgorithmStepError
 
 
 # Create your views here.
@@ -83,8 +83,19 @@ def pheflux_prediction(request):
                 prefix_log = request.POST["prefix_log_file"]
                 verbosity = request.POST["verbosity"]
             # Se inicia la ejecucion del algoritmo con el input.csv generado, los datos de prefix_log y verbosity
-                predictions = getFluxes(
-                    "Pheflux/utils/input.csv", prefix_log, verbosity)
+                try:    
+                    predictions = getFluxes(
+                        "Pheflux/utils/input.csv", prefix_log, verbosity)
+                except AlgorithmStepError as e:
+                    # Identificar en qué paso ocurrió el error y obtener el mensaje de error
+                    step = e.step
+                    message = e.args[0]  # Obtener la descripción del error
+
+                    error_data = {
+                        'error_message': f"Error en {step}: {message}"
+                    }
+                    return JsonResponse(error_data, status=500)
+                    # return HttpResponse(f"Error en {step}: {message}", status=500)
             # Se crean las rutas del archivo de prediction y log
                 ruta_solve = f"{predictions[0]}/{predictions[1]}"
                 ruta_log = f"{predictions[0]}/{predictions[2]}"
@@ -105,26 +116,36 @@ def pheflux_prediction(request):
                     buffer, content_type='application/octet-stream')
                 response['Content-Disposition'] = 'attachment; filename="results.zip"'
                 # Almacenar la respuesta en una variable de sesión para usarla después de la redirección
+                # Redireccionar a la misma vista (GET) después de procesar el formulario
                 return response
-               # Redireccionar a la misma vista (GET) después de procesar el formulario
-
-            context = {
-                'formPheflux': PhefluxForm(),  # Agrega el formulario a tu contexto
-                # Pasar la respuesta de descarga al contexto
-                'download_response': response,
-            }
-
-            return render(request, 'pheflux_form.html', context)
+            # Aqui en vez de un return render deberia retornar el error de formulario
+            else:
+                error_message = None  # Inicializar el mensaje de error como None
+                error_fields = ['geneExp_file', 'medium_file', 'network_file']
+                for field in error_fields:
+                    if field in form.errors:
+                        error_message = form.errors[field][0]
+                        break
+                
+                if error_message is None:
+                    error_message = 'Invalid form'
+                error_data = {
+                        'error_message': error_message
+                    }
+                return JsonResponse(error_data, status=500)
     else:
         formPheflux = PhefluxForm()
         formSearchBiGG = SearchBiGGForm()
+        
         context = {'formPheflux': formPheflux,
-                   'formSearchBiGG': formSearchBiGG}
+                'formSearchBiGG': formSearchBiGG,
+                }
+        # return render(request, 'static/dist/index.html')
         return render(
-            request,
-            'pheflux_form.html',
-            context
-        )
+                request,
+                'pheflux_form.html',
+                context
+            )
     # Caso de que no sea una peticion POST renderiza los formularios
 
 
@@ -305,3 +326,14 @@ def download_file(file_uuid_list, query):
     else:
         print("Error al descargar el archivo:", response.status_code)
         return file_name
+
+def get_error_message(request):
+    # Obtén el mensaje de error de algún lugar (por ejemplo, de una variable de sesión)
+    error_message = request.session.get('error_message')
+    
+    if error_message:
+        # Borra el mensaje de error de la sesión después de obtenerlo
+        del request.session['error_message']
+        
+    data = {'error_message': error_message}
+    return JsonResponse(data)
