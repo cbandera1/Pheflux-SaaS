@@ -8,6 +8,9 @@ import requests
 import pdb
 import re
 import time
+import random
+import string
+from datetime import datetime
 from django.http import *
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render, redirect
@@ -28,7 +31,8 @@ def pheflux_prediction(request):
             form = PhefluxForm(request.POST, request.FILES)
 
             if form.is_valid():
-
+                timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+                random_suffix = generate_random_string()
                 ## GENEEXP_FILE##
                 geneExp_file = request.FILES['geneExp_file']
             # Se genera un archivo temporal para guardar los datos
@@ -70,13 +74,18 @@ def pheflux_prediction(request):
                 condition = request.POST["condition"]
 
             # Se genera el archivo input.csv con los datos ingresados
-                with open("Pheflux/utils/input.csv", "w") as input_file:
-                    writer = csv.writer(input_file, delimiter="\t",
-                                        lineterminator="\n")
-                    writer.writerow(["Organism", "Condition",
-                                    "GeneExpFile", "Medium", "Network",])
-                    writer.writerow([organism, condition,
-                                    gene_temp_route, medium_temp_route, network_temp_route])
+                # with open("Pheflux/utils/input.csv", "w") as input_file:
+                #     writer = csv.writer(input_file, delimiter="\t",
+                #                         lineterminator="\n")
+                #     writer.writerow(["Organism", "Condition",
+                #                     "GeneExpFile", "Medium", "Network",])
+                #     writer.writerow([organism, condition,
+                #                     gene_temp_route, medium_temp_route, network_temp_route])
+
+                with open(f"Pheflux/utils/input_{timestamp}_{random_suffix}.csv", "w") as input_file:
+                    writer = csv.writer(input_file, delimiter="\t", lineterminator="\n")
+                    writer.writerow(["Organism", "Condition", "GeneExpFile", "Medium", "Network"])
+                    writer.writerow([organism, condition, gene_temp_route, medium_temp_route, network_temp_route])
 
             # Se obtienen los datos de prefix_log y verbosity
 
@@ -84,7 +93,7 @@ def pheflux_prediction(request):
                 verbosity = request.POST["verbosity"]
             # Se inicia la ejecucion del algoritmo con el input.csv generado, los datos de prefix_log y verbosity
                 predictions = getFluxes(
-                    "Pheflux/utils/input.csv", prefix_log, verbosity)
+                    f"Pheflux/utils/input_{timestamp}_{random_suffix}.csv", prefix_log, verbosity)
             # Se crean las rutas del archivo de prediction y log
                 ruta_solve = f"{predictions[0]}/{predictions[1]}"
                 ruta_log = f"{predictions[0]}/{predictions[2]}"
@@ -305,3 +314,8 @@ def download_file(file_uuid_list, query):
     else:
         print("Error al descargar el archivo:", response.status_code)
         return file_name
+    
+def generate_random_string(length=6):
+    # Función para generar una cadena aleatoria de caracteres
+    characters = string.ascii_letters + string.digits
+    return ''.join(random.choice(characters) for _ in range(length))
