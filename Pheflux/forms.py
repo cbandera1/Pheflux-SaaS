@@ -10,7 +10,7 @@ class PhefluxForm(forms.Form):
     geneExp_file = forms.FileField(label="geneExp File")
     medium_file = forms.FileField(label="Medium File")
     network_file = forms.FileField(label="Network")
-    verbosity = forms.BooleanField(required=True)
+    verbosity = forms.BooleanField(required=False)
     prefix_log_file = forms.CharField(label="Log Prefix", max_length=100)
 
     def clean_geneExp_file(self):

@@ -397,38 +397,43 @@ def getFluxes(inputFileName, prefix_log, verbosity):
     shuffledFPKM = pd.DataFrame()
     #################################################################################
     # Load "InputData" file
-    try:
-        inputData = pd.read_csv(inputFileName, sep="\t",
+
+    inputData = pd.read_csv(inputFileName, sep="\t",
                                     lineterminator='\n', na_filter=False)
-        nRows, nCols = inputData.shape        
-        shuffle = False
-        opt_time, t_time = [], []
-        for i in range(nRows):
-            ##############################################################
-            # Load information from InputData
-            condition = inputData.loc[i]["Condition"]
-            geneExpFile = inputData.loc[i]["GeneExpFile"]
-            mediumFile = inputData.loc[i]["Medium"]
-            network = inputData.loc[i]["Network"]
-            organism = inputData.loc[i]["Organism"]
-            if pd.isnull(condition) or pd.isnull(geneExpFile) or pd.isnull(mediumFile) or pd.isnull(network) or pd.isnull(organism):
-                raise AlgorithmStepError("Step 1", "One or more files are not valid.")
+    nRows, nCols = inputData.shape        
+    shuffle = False
+    opt_time, t_time = [], []
+    for i in range(nRows):
+        ##############################################################
+        # Load information from InputData
+        condition = inputData.loc[i]["Condition"]
+        geneExpFile = inputData.loc[i]["GeneExpFile"]
+        mediumFile = inputData.loc[i]["Medium"]
+        network = inputData.loc[i]["Network"]
+        organism = inputData.loc[i]["Organism"]
+        if pd.isnull(condition) or pd.isnull(geneExpFile) or pd.isnull(mediumFile) or pd.isnull(network) or pd.isnull(organism):
+            raise AlgorithmStepError("Step 1", "One or more files are not valid.")
 
 
-            ##############################################################
-            # Messages in terminal
-            atime = actuallyTime()
-            print(atime, 'Condition ejecuted:', organism, '-', condition)
+        ##############################################################
+         # Messages in terminal
+        atime = actuallyTime()
+        print(atime, 'Condition ejecuted:', organism, '-', condition)
 
             ##############################################################
             # Metabolic network
+    try:
             if verbosity:
                 atime = actuallyTime()
                 print(atime, "Loading metabolic model:",
                     network.split("/")[-1].split(".")[0])
+            print('1')
             model_default = cobra.io.read_sbml_model(network)
+            print('1')
             fpkm = pd.read_csv(geneExpFile, sep="\t", lineterminator='\n')
+            print('1')
             init_time = time.time()
+            print('1')
     except Exception as e:
             raise AlgorithmStepError("Step 2", "Incorrect Network File Format.")
             ##############################################################

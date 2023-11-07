@@ -31,6 +31,7 @@ def pheflux_prediction(request):
             form = PhefluxForm(request.POST, request.FILES)
 
             if form.is_valid():
+                verbosity = request.POST.get("verbosity", False)
                 timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
                 random_suffix = generate_random_string()
                 ## GENEEXP_FILE##
@@ -86,6 +87,14 @@ def pheflux_prediction(request):
                     writer = csv.writer(input_file, delimiter="\t", lineterminator="\n")
                     writer.writerow(["Organism", "Condition", "GeneExpFile", "Medium", "Network"])
                     writer.writerow([organism, condition, gene_temp_route, medium_temp_route, network_temp_route])
+                # with open(f"Pheflux/utils/input_{timestamp}_{random_suffix}.csv", "w") as input_file:
+                #     writer = csv.writer(input_file, delimiter="\t",
+                #                         lineterminator="\n")
+                #     writer.writerow(["Organism", "Condition",
+                #                     "GeneExpFile", "Medium", "Network",])
+                #     writer.writerow([organism, condition,
+                #                     gene_temp_route, medium_temp_route, network_temp_route])
+                
 
             # Se obtienen los datos de prefix_log y verbosity
 
@@ -94,7 +103,12 @@ def pheflux_prediction(request):
             # Se inicia la ejecucion del algoritmo con el input.csv generado, los datos de prefix_log y verbosity
                 try:    
                     predictions = getFluxes(
-                        "Pheflux/utils/input.csv", prefix_log, verbosity)
+                        f"Pheflux/utils/input_{timestamp}_{random_suffix}.csv", prefix_log, verbosity)
+                    os.remove(f"Pheflux/utils/input_{timestamp}_{random_suffix}.csv")
+                    os.remove(gene_temp_route)
+                    os.remove(medium_temp_route)
+                    os.remove(network_temp_route)
+                    
                 except AlgorithmStepError as e:
                     # Identificar en qué paso ocurrió el error y obtener el mensaje de error
                     step = e.step

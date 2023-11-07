@@ -27,6 +27,22 @@
   #loading-spinner.active {
     visibility: visible;
   }
+
+  /* Estilo para el checkbox */
+  .custom-checkbox .custom-control-input:checked ~ .custom-control-label::before {
+    background-color: #007bff; /* Cambia el color de fondo al azul predeterminado de Bootstrap */
+    border-color: #007bff; /* Cambia el borde al color de fondo */
+  }
+
+  /* Cambia el color del texto de la etiqueta cuando el checkbox está marcado */
+  .custom-checkbox .custom-control-input:checked ~ .custom-control-label::after {
+    color: #fff; /* Cambia el color del texto a blanco cuando está marcado */
+  }
+
+  .form-check .form-check-input {
+  
+}
+
 </style>
 
 
@@ -39,57 +55,60 @@
 <h2 class="">Pheflux</h2>
 {% if formPheflux %}
 <form id="procesar-form" method="post" enctype="multipart/form-data" onsubmit="event.preventDefault();">
-  {% csrf_token %}  
-  <div class="form-group row mt-5 mb-2">
-    <label for="{{ formPheflux.organism.id_for_label }}" class="col-md-4 text-md-right">{{ formPheflux.organism.label }}</label>
-    <div class="col-md-6">
+  {% csrf_token %}
+  <div class="form-group row mt-3">
+    <label for="{{ formPheflux.organism.id_for_label }}" class="col-md-4 col-form-label text-md-right">Organism</label>
+    <div class="col-md-8">
       {{ formPheflux.organism }}
     </div>
   </div>
-  <div class="form-group row mb-2">
-    <label for="{{ formPheflux.condition.id_for_label }}" class="col-md-4 text-md-right">{{ formPheflux.condition.label }}</label>
-    <div class="col-md-6">
+  <div class="form-group row mt-3">
+    <label for="{{ formPheflux.condition.id_for_label }}" class="col-md-4 col-form-label text-md-right">Condition</label>
+    <div class="col-md-8">
       {{ formPheflux.condition }}
     </div>
   </div>
-  <div class="form-group row mb-2">
-    <label for="{{ formPheflux.geneExp_file.id_for_label }}" class="col-md-4 text-md-right">{{ formPheflux.geneExp_file.label }}</label>
-    <div class="col-md-6 mx-3">
+  <div class="form-group row mt-3">
+    <label for="{{ formPheflux.geneExp_file.id_for_label }}" class="col-md-4 col-form-label text-md-right">GeneExp File</label>
+    <div class="col-md-8">
       {{ formPheflux.geneExp_file }}
     </div>
   </div>
-  <div class="form-group row mb-2">
-    <label for="{{ formPheflux.medium_file.id_for_label }}" class="col-md-4 text-md-right">{{ formPheflux.medium_file.label }}</label>
-    <div class="col-md-6 mx-3">
-      {{ formPheflux.medium_file }}      
+  <div class="form-group row mt-3">
+    <label for "{{ formPheflux.medium_file.id_for_label }}" class="col-md-4 col-form-label text-md-right">Medium File</label>
+    <div class="col-md-8">
+      {{ formPheflux.medium_file }}
     </div>
   </div>
-  <div class="form-group row mb-2">
-    <label for="{{ formPheflux.network_file.id_for_label }}" class="col-md-4 text-md-right">{{ formPheflux.network_file.label }}</label>
-    <div class="col-md-6 mx-3">
+  <div class="form-group row mt-3">
+    <label for="{{ formPheflux.network_file.id_for_label }}" class="col-md-4 col-form-label text-md-right">Network File</label>
+    <div class="col-md-8">
       {{ formPheflux.network_file }}
     </div>
   </div>
-  <div class="form-group row mb-2">
-    <label for="{{ formPheflux.prefix_log_file.id_for_label }}" class="col-md-4 text-md-right">{{ formPheflux.prefix_log_file.label }}</label>
-    <div class="col-md-6">
+  <div class="form-group row mt-3">
+    <label for="{{ formPheflux.prefix_log_file.id_for_label }}" class="col-md-4 col-form-label text-md-right">Log Prefix</label>
+    <div class="col-md-8">
       {{ formPheflux.prefix_log_file }}
     </div>
   </div>
-  
+  <div class="form-group row mt-3">
+    <label for="{{ formPheflux.verbosity.id_for_label }}" class="col-md-4 col-form-label text-md-right">{{ formPheflux.verbosity.label }}</label>
+    <div class="col-md-8 form-check" style="margin-top: 15px;">
+      {{ formPheflux.verbosity }}
+    </div>
+  </div>
+  <!-- <div class="form-group row mt-3">
     <div class="">
       <div class="form-check">
-        {{ formPheflux.verbosity }}
         <label class="form-check-label" for="{{ formPheflux.verbosity.id_for_label }}">{{ formPheflux.verbosity.label }}</label>
+        {{ formPheflux.verbosity }}
       </div>
-    
-  </div>
+    </div>
+  </div> -->
   <input type="hidden" name="form_type" value="formPheflux">
-    <button id="submit-btn" type="submit" class="btn btn-primary mt-4">Submit</button>
-  
+  <button id="submit-btn" type="submit" class="btn btn-primary mt-4">Submit</button>
 </form>
-
-
 
 {% endif %}
 <div class="form-group row mt-3">
@@ -154,12 +173,15 @@ function procesarFormulario() {
   })
   .then(function(response) {
     if (response.ok) {
-      const succesDiv = document.getElementById('success-message');
-      succesDiv.style.display = 'block';
+      const successDiv = document.getElementById('success-message');
+      successDiv.style.display = 'block';
+      setTimeout(function() {
+        successDiv.style.display = 'none'; // Ocultar el mensaje después de 2 segundos
+      }, 6000); // 2000 milisegundos (2 segundos)
       return response.blob(); // Convertir la respuesta a un objeto Blob
-    } else {
+  } else {
       return response.json();
-    }
+  }
   }).then(function(data) {
   if (data.error_message) {
     // Si la JsonResponse contiene un mensaje de error, mostrarlo
@@ -171,7 +193,10 @@ function procesarFormulario() {
     var url = URL.createObjectURL(blobData);
     var link = document.createElement('a');
     link.href = url;
-    link.download = 'results.zip';
+    var organismValue = formData.get('organism'); // Obtener el valor del campo "organism" del formulario
+    var conditionValue = formData.get('condition'); // Obtener el valor del campo "condition" del formulario
+    var fileName = organismValue + '_' + conditionValue + '_Results.zip'; // Crear el nombre del archivo ZIP
+    link.download = fileName; // Establecer el nombre del archivo ZIP
     document.body.appendChild(link);
     link.click();
 
@@ -206,6 +231,11 @@ function mostrarError(message) {
     const errorDiv = document.getElementById('error-message');
     errorDiv.textContent = message;
     errorDiv.style.display = 'block';
+
+    // Programar la ocultación del mensaje después de 6 segundos (6000 milisegundos)
+    setTimeout(function () {
+        errorDiv.style.display = 'none'; // Ocultar el mensaje
+    }, 6000);
 }
 
 // Función para ocultar el mensaje de error

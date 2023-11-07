@@ -2,6 +2,7 @@
 
 <head>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <style>
   html {
@@ -33,6 +34,11 @@
   #loading-spinner h6 {
     margin-top: 20px;
   }
+  
+  .nav-bar-icon{
+    line-height: 2.4;
+    padding-right: 10px;
+  }
 
 </style>
 
@@ -50,8 +56,14 @@
             <li class="nav-item">
               <a class="nav-link active" aria-current="page" href="#">Home</a>
             </li>
+            <li>
+              <i class="fa fa-home nav-bar-icon" aria-hidden="true"></i>
+            </li>
             <li class="nav-item">
               <a class="nav-link" href="http://127.0.0.1:8000/pheflux/">Predict</a>
+            </li>
+            <li>
+              <i class="fa fa-calculator nav-bar-icon" aria-hidden="true"></i>
             </li>
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -61,6 +73,9 @@
                 <li><a class="dropdown-item" href="http://127.0.0.1:8000/pheflux/biggsearch">Bigg Model</a></li>
                 <li><a class="dropdown-item" href="http://127.0.0.1:8000/pheflux/tcgasearch">TCGA</a></li>
               </ul>
+            </li>
+            <li>
+              <i class="fa fa-search nav-bar-icon" aria-hidden="true"></i>
             </li>
           </ul>
         </div>
@@ -76,36 +91,26 @@
 
 
 
-  <!-- Footer -->
-  <footer class="footer bg-dark w-100 py-3 position-absolute bottom-0 start-50 translate-middle-x text-center text-white">
-    <!-- Grid container -->
-    <div class="container p-4">
+<!-- Footer -->
+<footer class="footer bg-dark w-100 py-3 position-absolute bottom-0 start-50 translate-middle-x text-center text-white">
+  <!-- Grid container -->
+  <div class="container p-4">
+    <!-- Section: Text -->
+    <section class="mb-4">
+      <p>
+        Pheflux is a website that provides tools for the analysis and prediction of biological data. Our mission is to help you obtain valuable insights from your data and make accurate predictions.
+      </p>
+    </section>
+    <!-- Section: Text -->
+  </div>
+  <!-- Grid container -->
 
-
-
-      <!-- Section: Text -->
-      <section class="mb-4">
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Sunt
-          distinctio earum repellat quaerat voluptatibus placeat nam,
-          commodi optio pariatur est quia magnam eum harum corrupti dicta,
-          aliquam sequi voluptate quas.
-        </p>
-      </section>
-      <!-- Section: Text -->
-
-
-    </div>
-    <!-- Grid container -->
-
-    <!-- Copyright -->
-    <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2)">
-      © 2023 Copyright:
-      <a class="text-white" href="https://mdbootstrap.com/">MDBootstrap.com</a>
-    </div>
-    <!-- Copyright -->
-
-  </footer>
-  <!-- Footer -->    
+  <!-- Copyright -->
+  <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2)">
+    © 2023 Pheflux
+  </div>
+  <!-- Copyright -->
+</footer>
+<!-- Footer -->
 
 </html>
