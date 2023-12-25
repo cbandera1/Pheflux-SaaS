@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load static %}
+
+<div class="landing-container">
+    <div class="landing-content">
+        <div class="landing-description">
+            <div class="landing-overview">
+                Overview
+            </div>
+            <div class="landing-title">
+                PheFlux: Illuminating Metabolic Pathways with Precision Predictions
+            </div>
+            <div class="landing-par">
+                Metabolic intricacies within living organisms pose challenges for comprehensive understanding, demanding advanced tools for precise predictions. 
+                PheFlux, an innovative Python-based algorithm, emerges as a beacon in deciphering metabolic fluxes with unparalleled accuracy. Operating at the 
+                intersection of biology and computational prowess, PheFlux facilitates predictions that are pivotal for unraveling the mysteries of cellular 
+                metabolism.
+            </div>
+            <div class="landing-par">
+                Similar to the global threat of antimicrobial resistance, where phage therapy serves as a promising approach, PheFlux addresses the complexities 
+                of metabolic predictions. Currently, researchers face hurdles due to the technical intricacies of programming required for utilizing the PheFlux 
+                algorithm. To bridge this gap, a user-friendly online platform is proposed to revolutionize accessibility and enhance the utilization of PheFlux 
+                in the realm of Experimental Biology.
+            </div>
+            <div class="landing-par">
+                Introducing PheFluxWeb, an integrated web-based platform designed for the distribution of the PheFlux algorithm. This platform aims to break down 
+                barriers by providing researchers with a straightforward and intuitive interface to interact with PheFlux. By leveraging the power of the web, 
+                PheFluxWeb allows users to remotely access the algorithm through a web browser, eliminating the need for advanced programming skills.
+            </div>
+            <div class="landing-par">
+                PheFluxWeb operates on a diverse range of parameters, including "Organism," "Condition," "GeneExpFile," "Medium," and "Network." Each parameter 
+                contributes to the precision of metabolic predictions, allowing researchers to tailor their analyses to specific biological contexts. Whether 
+                examining a bacterial species or a yeast cell, predicting under specific growth conditions, or analyzing gene expression data, PheFluxWeb accommodates 
+                a multitude of scenarios.
+            </div>
+        </div>
+        <div class="landing-image">
+            <img src="{% static '/media/phefluxDesc.jpg' %}" alt="pefluxDesc">
+        </div>
+    </div>
+    <div class="landing-updates">
+        {% for update in updates %}
+            <div class="update-item">
+                <div >
+                <small>- {{ update.timestamp }}</small>
+                </div>
+                <strong>{{ update.title }}</strong>
+                <p>{{ update.content }}</p>
+                
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

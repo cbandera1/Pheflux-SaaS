@@ -8,16 +8,29 @@ import requests
 import pdb
 import re
 import time
+import random
+import string
+from datetime import datetime
 from django.http import *
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render, redirect
 from django.template import loader
 from .forms import *
 from .utils.pheflux import getFluxes, AlgorithmStepError
+from .models import Update
 
 
 # Create your views here.
 
+def landing(request):
+    updates = Update.objects.all().order_by('-timestamp')[:5]  # Obtener las últimas 5 actualizaciones
+    return render(request, 'landing.html', {'updates': updates})
+
+def redirect_to_landing(request):
+    return redirect('/pheflux/landing/')
+
+def help(request):
+    return render(request, 'help.html')
 
 def pheflux_prediction(request):
     # Revisa si es que se realiza una request POST en pheflux view
@@ -28,7 +41,9 @@ def pheflux_prediction(request):
             form = PhefluxForm(request.POST, request.FILES)
 
             if form.is_valid():
-
+                verbosity = request.POST.get("verbosity", False)
+                timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+                random_suffix = generate_random_string()
                 ## GENEEXP_FILE##
                 geneExp_file = request.FILES['geneExp_file']
             # Se genera un archivo temporal para guardar los datos
@@ -70,13 +85,26 @@ def pheflux_prediction(request):
                 condition = request.POST["condition"]
 
             # Se genera el archivo input.csv con los datos ingresados
-                with open("Pheflux/utils/input.csv", "w") as input_file:
-                    writer = csv.writer(input_file, delimiter="\t",
-                                        lineterminator="\n")
-                    writer.writerow(["Organism", "Condition",
-                                    "GeneExpFile", "Medium", "Network",])
-                    writer.writerow([organism, condition,
-                                    gene_temp_route, medium_temp_route, network_temp_route])
+                # with open("Pheflux/utils/input.csv", "w") as input_file:
+                #     writer = csv.writer(input_file, delimiter="\t",
+                #                         lineterminator="\n")
+                #     writer.writerow(["Organism", "Condition",
+                #                     "GeneExpFile", "Medium", "Network",])
+                #     writer.writerow([organism, condition,
+                #                     gene_temp_route, medium_temp_route, network_temp_route])
+
+                with open(f"Pheflux/utils/input_{timestamp}_{random_suffix}.csv", "w") as input_file:
+                    writer = csv.writer(input_file, delimiter="\t", lineterminator="\n")
+                    writer.writerow(["Organism", "Condition", "GeneExpFile", "Medium", "Network"])
+                    writer.writerow([organism, condition, gene_temp_route, medium_temp_route, network_temp_route])
+                # with open(f"Pheflux/utils/input_{timestamp}_{random_suffix}.csv", "w") as input_file:
+                #     writer = csv.writer(input_file, delimiter="\t",
+                #                         lineterminator="\n")
+                #     writer.writerow(["Organism", "Condition",
+                #                     "GeneExpFile", "Medium", "Network",])
+                #     writer.writerow([organism, condition,
+                #                     gene_temp_route, medium_temp_route, network_temp_route])
+                
 
             # Se obtienen los datos de prefix_log y verbosity
 
@@ -85,7 +113,12 @@ def pheflux_prediction(request):
             # Se inicia la ejecucion del algoritmo con el input.csv generado, los datos de prefix_log y verbosity
                 try:    
                     predictions = getFluxes(
-                        "Pheflux/utils/input.csv", prefix_log, verbosity)
+                        f"Pheflux/utils/input_{timestamp}_{random_suffix}.csv", prefix_log, verbosity)
+                    os.remove(f"Pheflux/utils/input_{timestamp}_{random_suffix}.csv")
+                    os.remove(gene_temp_route)
+                    os.remove(medium_temp_route)
+                    os.remove(network_temp_route)
+                    
                 except AlgorithmStepError as e:
                     # Identificar en qué paso ocurrió el error y obtener el mensaje de error
                     step = e.step
@@ -337,3 +370,8 @@ def get_error_message(request):
         
     data = {'error_message': error_message}
     return JsonResponse(data)
+
+def generate_random_string(length=6):
+    # Función para generar una cadena aleatoria de caracteres
+    characters = string.ascii_letters + string.digits
+    return ''.join(random.choice(characters) for _ in range(length))
