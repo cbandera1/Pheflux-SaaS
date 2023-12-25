@@ -17,10 +17,20 @@ from django.shortcuts import render, redirect
 from django.template import loader
 from .forms import *
 from .utils.pheflux import getFluxes, AlgorithmStepError
+from .models import Update
 
 
 # Create your views here.
 
+def landing(request):
+    updates = Update.objects.all().order_by('-timestamp')[:5]  # Obtener las últimas 5 actualizaciones
+    return render(request, 'landing.html', {'updates': updates})
+
+def redirect_to_landing(request):
+    return redirect('/pheflux/landing/')
+
+def help(request):
+    return render(request, 'help.html')
 
 def pheflux_prediction(request):
     # Revisa si es que se realiza una request POST en pheflux view

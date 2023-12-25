@@ -40,47 +40,169 @@
     padding-right: 10px;
   }
 
+.form-container {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    background-color: rgba(var(--bs-light-rgb),var(--bs-bg-opacity))!important;
+}
+
+.custom-file-upload {
+    border: 1px solid #ccc;
+    display: inline-block;
+    padding: 6px 12px;
+    cursor: pointer;
+}
+
+label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    text-align: start;
+    color: #333;
+    font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    margin-top: 15px;
+}
+
+input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    background-color: #4caf50;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.landing-content {
+    display: flex;
+}
+
+.landing-description {
+    flex: 1;
+    padding: 20px;
+}
+
+.landing-image {
+    padding: 20px;
+}
+
+.landing-updates {
+    flex: 1;
+    padding: 20px;
+}
+
+.update-item {
+  position: relative;
+}
+
+.circle-position{
+  position: absolute;
+  top: -5px;
+}
+
+.landing-title {
+  color: #02b2b5;
+  font-size: 24px;
+  font-weight: bold;
+  margin-top:10px;
+}
+
+.landing-par{
+  margin-top: 15px;
+}
+
+.landing-overview{
+  font-weight: bold;
+  color: #303133;
+  border-left: 2px solid #02b2b5;
+  padding-left: 10px;
+}
+
+.help-text{
+  font-size: 24px;
+}
+
+.help-text-2{
+  font-size: 24px;
+  text-align: center;
+}
+
+.using-service-images{
+  text-align: center;
+  margin-bottom: 80px;
+}
+
+.margin-b-40{
+  margin-bottom: 40px;
+}
 </style>
 
 </head>
 <body class="bg-light">
   
-  <nav class="navbar navbar-expand-lg" style="background-color: #03b0df;">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="#">Pheflux</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#">Home</a>
-            </li>
-            <li>
-              <i class="fa fa-home nav-bar-icon" aria-hidden="true"></i>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="http://127.0.0.1:8000/pheflux/">Predict</a>
-            </li>
-            <li>
-              <i class="fa fa-calculator nav-bar-icon" aria-hidden="true"></i>
-            </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Search
-              </a>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="http://127.0.0.1:8000/pheflux/biggsearch">Bigg Model</a></li>
-                <li><a class="dropdown-item" href="http://127.0.0.1:8000/pheflux/tcgasearch">TCGA</a></li>
-              </ul>
-            </li>
-            <li>
-              <i class="fa fa-search nav-bar-icon" aria-hidden="true"></i>
-            </li>
-          </ul>
-        </div>
+
+  <nav class="navbar navbar-expand-lg" style="background-color: #DCEDF9;">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="http://127.0.0.1:8000">Pheflux</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 ml-auto">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="http://127.0.0.1:8000">Home</a>
+          </li>
+          <li class="nav-item">
+            <i class="fa fa-home nav-bar-icon" aria-hidden="true"></i>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="http://127.0.0.1:8000/pheflux/predict">Predict</a>
+          </li>
+          <li class="nav-item">
+            <i class="fa fa-calculator nav-bar-icon" aria-hidden="true"></i>
+          </li>
+          <!-- <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Search
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="http://127.0.0.1:8000/pheflux/biggsearch">Bigg Model</a></li>
+              <li><a class="dropdown-item" href="http://127.0.0.1:8000/pheflux/tcgasearch">TCGA</a></li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <i class="fa fa-search nav-bar-icon" aria-hidden="true"></i>
+          </li> -->
+          <li class="nav-item">
+            <a class="nav-link" href="http://127.0.0.1:8000/pheflux/help">Help</a>
+          </li>
+          <li class="nav-item">
+            <i class="fa-solid fa-circle-info nav-bar-icon" aria-hidden="true"></i>
+          </li>
+        </ul>
       </div>
-    </nav>
+    </div>
+  </nav>
+  
     
       {% block content %}
       {% endblock %}
@@ -97,9 +219,6 @@
   <div class="container p-4">
     <!-- Section: Text -->
     <section class="mb-4">
-      <p>
-        Pheflux is a website that provides tools for the analysis and prediction of biological data. Our mission is to help you obtain valuable insights from your data and make accurate predictions.
-      </p>
     </section>
     <!-- Section: Text -->
   </div>

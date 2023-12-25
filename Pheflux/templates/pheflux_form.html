@@ -1,16 +1,13 @@
 {% extends 'base.html' %}
 
 <head>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/spin.js/4.1.0/spin.min.js"></script>
+<link rel="stylesheet" href="styles.css">
+</head>
 <style>
-  body, html {
-    height: 100%;
-    margin: 0;
-  }
-
-  #loading-spinner {
+    #loading-spinner {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -27,89 +24,94 @@
   #loading-spinner.active {
     visibility: visible;
   }
-
-  /* Estilo para el checkbox */
-  .custom-checkbox .custom-control-input:checked ~ .custom-control-label::before {
-    background-color: #007bff; /* Cambia el color de fondo al azul predeterminado de Bootstrap */
-    border-color: #007bff; /* Cambia el borde al color de fondo */
-  }
-
-  /* Cambia el color del texto de la etiqueta cuando el checkbox está marcado */
-  .custom-checkbox .custom-control-input:checked ~ .custom-control-label::after {
-    color: #fff; /* Cambia el color del texto a blanco cuando está marcado */
-  }
-
-  .form-check .form-check-input {
-  
-}
-
 </style>
 
-
-
-</head>
-
-
 {% block content %}
-<div class ="container text-center w-50 rounded mt-5 pb-1 border border-secondary " style="background-color: #f6f6f6;">
+<div class ="container text-center w-50 rounded mt-5 pb-1" style="background-color: rgba(var(--bs-light-rgb),var(--bs-bg-opacity))!important;">
 <h2 class="">Pheflux</h2>
 {% if formPheflux %}
-<form id="procesar-form" method="post" enctype="multipart/form-data" onsubmit="event.preventDefault();">
+<!-- <form id="procesar-form" method="post" enctype="multipart/form-data" onsubmit="event.preventDefault();">
   {% csrf_token %}
-  <div class="form-group row mt-3">
-    <label for="{{ formPheflux.organism.id_for_label }}" class="col-md-4 col-form-label text-md-right">Organism</label>
-    <div class="col-md-8">
-      {{ formPheflux.organism }}
-    </div>
-  </div>
-  <div class="form-group row mt-3">
-    <label for="{{ formPheflux.condition.id_for_label }}" class="col-md-4 col-form-label text-md-right">Condition</label>
-    <div class="col-md-8">
-      {{ formPheflux.condition }}
-    </div>
-  </div>
-  <div class="form-group row mt-3">
-    <label for="{{ formPheflux.geneExp_file.id_for_label }}" class="col-md-4 col-form-label text-md-right">GeneExp File</label>
-    <div class="col-md-8">
-      {{ formPheflux.geneExp_file }}
-    </div>
-  </div>
-  <div class="form-group row mt-3">
-    <label for "{{ formPheflux.medium_file.id_for_label }}" class="col-md-4 col-form-label text-md-right">Medium File</label>
-    <div class="col-md-8">
-      {{ formPheflux.medium_file }}
-    </div>
-  </div>
-  <div class="form-group row mt-3">
-    <label for="{{ formPheflux.network_file.id_for_label }}" class="col-md-4 col-form-label text-md-right">Network File</label>
-    <div class="col-md-8">
-      {{ formPheflux.network_file }}
-    </div>
-  </div>
-  <div class="form-group row mt-3">
-    <label for="{{ formPheflux.prefix_log_file.id_for_label }}" class="col-md-4 col-form-label text-md-right">Log Prefix</label>
-    <div class="col-md-8">
-      {{ formPheflux.prefix_log_file }}
-    </div>
-  </div>
-  <div class="form-group row mt-3">
-    <label for="{{ formPheflux.verbosity.id_for_label }}" class="col-md-4 col-form-label text-md-right">{{ formPheflux.verbosity.label }}</label>
-    <div class="col-md-8 form-check" style="margin-top: 15px;">
-      {{ formPheflux.verbosity }}
-    </div>
-  </div>
-  <!-- <div class="form-group row mt-3">
-    <div class="">
-      <div class="form-check">
-        <label class="form-check-label" for="{{ formPheflux.verbosity.id_for_label }}">{{ formPheflux.verbosity.label }}</label>
-        {{ formPheflux.verbosity }}
-      </div>
-    </div>
-  </div> -->
-  <input type="hidden" name="form_type" value="formPheflux">
-  <button id="submit-btn" type="submit" class="btn btn-primary mt-4">Submit</button>
-</form>
 
+  <div class="form-group row mt-3 col-md-12">
+    <label for="{{ formPheflux.organism.id_for_label }}" class="col-form-label text-md-right">Organism</label>
+  </div>
+  <div class="input-box">
+    {{ formPheflux.organism }}
+  </div>
+
+  <div class="form-group row mt-3 col-md-12">
+    <label for="{{ formPheflux.condition.id_for_label }}" class="col-form-label text-md-right">Condition</label>
+  </div>
+  <div class="">
+    {{ formPheflux.condition }}
+  </div>
+
+  <div class="form-group row mt-3 col-md-12 align-self-center">
+    <label for="{{ formPheflux.geneExp_file.id_for_label }}" class="col-form-label text-md-right">GeneExp File</label>
+  </div>
+  <div class="">
+    {{ formPheflux.geneExp_file }}
+  </div>
+
+  <div class="form-group row mt-3 col-md-12">
+    <label for="{{ formPheflux.medium_file.id_for_label }}" class="col-form-label text-md-right">Medium File</label>
+  </div>
+  <div class="">
+    {{ formPheflux.medium_file }}
+  </div>
+
+  <div class="form-group row mt-3 col-md-12">
+    <label for="{{ formPheflux.network_file.id_for_label }}" class="col-form-label text-md-right">Network File</label>
+  </div>
+  <div class="">
+    {{ formPheflux.network_file }}
+  </div>
+
+  <div class="form-group row mt-3 col-md-12">
+    <label for="{{ formPheflux.prefix_log_file.id_for_label }}" class="col-form-label text-md-right">Log Prefix</label>
+  </div>
+  <div class="">
+    {{ formPheflux.prefix_log_file }}
+  </div>
+
+  <div class="form-group row mt-3">
+    <label for="{{ formPheflux.verbosity.id_for_label }}" class="col-form-label text-md-right">{{ formPheflux.verbosity.label }}</label>
+  </div>
+  <div class="form-check" style="margin-top: 15px;">
+    {{ formPheflux.verbosity }}
+  </div>
+
+  <input type="hidden" name="form_type" value="formPheflux">
+  <button id="submit-btn" type="submit" class="btn btn-primary mt-4">Submit</button> -->
+  <form id="procesar-form" method="post" enctype="multipart/form-data" onsubmit="event.preventDefault();">
+    {% csrf_token %}
+  <div class="form-container">
+    <label for="{{ formPheflux.organism.id_for_label }}" class="col-form-label text-md-right">Organism</label>
+    {{ formPheflux.organism }}
+    
+    <label for="{{ formPheflux.condition.id_for_label }}" class="col-form-label text-md-right">Condition</label>
+    {{ formPheflux.condition }}
+    
+    <label for="{{ formPheflux.geneExp_file.id_for_label }}" class="col-form-label text-md-right custom">GeneExp File</label>
+    {{ formPheflux.geneExp_file }}
+    
+    <label for="{{ formPheflux.medium_file.id_for_label }}" class="col-form-label text-md-right">Medium File</label>
+    {{ formPheflux.medium_file }}
+    
+    <label for="{{ formPheflux.network_file.id_for_label }}" class="col-form-label text-md-right">Network File</label>
+    {{ formPheflux.network_file }}
+
+    <label for="{{ formPheflux.prefix_log_file.id_for_label }}" class="col-form-label text-md-right">Log Prefix</label>
+    {{ formPheflux.prefix_log_file }}
+    
+    <label for="{{ formPheflux.verbosity.id_for_label }}" class="col-form-label text-md-right">{{ formPheflux.verbosity.label }}</label>
+    {{ formPheflux.verbosity }}
+
+    <input type="hidden" name="form_type" value="formPheflux">
+    <button id="submit-btn" type="submit" class="btn btn-primary mt-4">Submit</button>
+</div>
+</form>
 {% endif %}
 <div class="form-group row mt-3">
   <div class="col-md-12">
@@ -167,7 +169,7 @@ function procesarFormulario() {
   var formData = new FormData(form);
 
   // Realizar la petición AJAX al servidor Django
-  fetch('/pheflux/', {
+  fetch('/pheflux/predict/', {
       method: 'POST',
       body: formData,
   })

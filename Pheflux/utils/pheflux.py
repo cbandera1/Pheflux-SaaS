@@ -427,13 +427,9 @@ def getFluxes(inputFileName, prefix_log, verbosity):
                 atime = actuallyTime()
                 print(atime, "Loading metabolic model:",
                     network.split("/")[-1].split(".")[0])
-            print('1')
             model_default = cobra.io.read_sbml_model(network)
-            print('1')
             fpkm = pd.read_csv(geneExpFile, sep="\t", lineterminator='\n')
-            print('1')
             init_time = time.time()
-            print('1')
     except Exception as e:
             raise AlgorithmStepError("Step 2", "Incorrect Network File Format.")
             ##############################################################

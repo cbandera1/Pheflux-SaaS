@@ -7,7 +7,10 @@ from crispy_forms.layout import Layout, Submit
 class PhefluxForm(forms.Form):
     organism = forms.CharField(label="Organism", max_length=100)
     condition = forms.CharField(label="Condition", max_length=100)
-    geneExp_file = forms.FileField(label="geneExp File")
+    geneExp_file = forms.FileField(label="geneExp File", widget=forms.ClearableFileInput(
+        attrs={"class": "custom-file-upload"}  # Use curly braces for the dictionary
+        )
+    )
     medium_file = forms.FileField(label="Medium File")
     network_file = forms.FileField(label="Network")
     verbosity = forms.BooleanField(required=False)

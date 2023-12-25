@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load static %}
+<div class="landing-container">
+    <div class="landing-content">
+        <div class="landing-description">
+            <div class="landing-overview">
+                Help
+            </div>
+            <div class="landing-title">
+                Input Description
+            </div>
+            <ul class="help-text">
+                <li>
+                    <b>Organism:</b> The organism for which metabolic flow predictions will be made, which can be a bacterial species or a yeast cell.
+                </li>
+                <li>
+                    <b>Condition:</b> Specifies the specific condition for predicting metabolic flows, such as a growth state, response to stimuli, or organism-specific situation.
+                </li>
+                <li>
+                    <b>GeneExpFile:</b> The gene expression file containing information about expression levels in the given condition, used by the algorithm to infer metabolic flows. 
+                    This file may have the following extensions: <b>.csv, .fpmk, .txt.</b>
+                </li>
+                <li>
+                    <b>Medium:</b> The cultivation medium where metabolic flow predictions will take place, potentially containing nutrients influencing metabolic activity. 
+                    This file may have the following extensions: <b>.csv, .fpmk, .txt, .xml.</b>
+                </li>
+                <li>
+                    <b>Network:</b> The metabolic network or model describing biochemical reactions and interactions between metabolites in the organism, based on experimental data. 
+                    This file may have the following extensions: <b>.xml</b>
+                </li>
+                <li>
+                    <b>Log Prefix:</b> Refers to the prefix of the file generated with information about the metabolic flux prediction process.
+                </li>
+                <li>
+                    <b>Verbosity:</b> This indicates the level of information that will be included in the log file. If it is marked, the system will keep track of the time taken at each step 
+                    of the metabolic flux prediction process. This information will be included in the log file, providing the total time taken for the entire process.
+                </li>
+            </ul>
+            <div class="landing-title">
+                Data Preprocessing
+            </div>
+            <div class="help-text">
+                For using the service you input files should follow the following format:
+                <lu>
+                    <li class="margin-b-40"><b>GeneExp File:</b>The format for the genetic expression file is a file with two columns, the first is the "Gene_ID" which represents the id for every gene of the organism,
+                    next the second column is the "Expression" column which represent the numeric value of expression levels, quantifying gene activity, mapped onto gene-protein-reaction (GPR) associations 
+                    within the model. 
+                        <a href="{% static '/exampleData/Ecoli_Expfile_Glucose.csv' %}" download>Example File</a>
+                    </li>
+                    <li class="margin-b-40"><b>Medium File:</b>The medium file also has two columns, with the first one called "Metabolite_Name", which refers to the chemical compounds involved in the metabolic reactions. 
+                        In the context of your medium data, it represents the substances available to the organism in its environment. The second column is "Reaction_ID", which is a unique identifier assigned to each 
+                        reaction in the metabolic model.
+                        <a href="{% static '/exampleData/Ecoli_Medium.csv' %}" download>Example File</a>
+                    </li>
+                    <li class="margin-b-40"><b>Network File:</b>The network file format should adhere to the Systems Biology Markup Language (SBML), a language specifically designed for representing biological models. SBML serves as a standardized format to 
+                        encapsulate the details of biological systems, providing a structured and interoperable way to represent various aspects of cellular processes.
+                        <a href="{% static '/exampleData/IJO1366.xml' %}" download>Example File</a>
+                    </li>
+                </lu>
+            </div>
+            <div class="landing-title">
+                Using the service
+            </div>
+            <div class="help-text-2">
+                The first step is to enter the text corresponding to the organism and the condition
+            </div>
+            <div class="using-service-images">
+                <img src="{% static '/media/service1.jpeg' %}" alt="service1">
+            </div>
+            <div class="help-text-2">
+                Next, the corresponding files for the genetic expression, medium, and network files must be entered into their respective fields.
+            </div>
+            <div class="using-service-images">
+                <img src="{% static '/media/service2.jpeg' %}" alt="service2">
+            </div>
+            <div class="help-text-2">
+                Next, you should enter the prefix for the log file and check the optional 'verbosity' checkbox.
+            </div>
+            <div class="using-service-images">
+                <img src="{% static '/media/service3.jpeg' %}" alt="service3">
+            </div>
+            <div class="help-text-2">
+                Finally, after clicking the submit button, a spinner should appear while the data is being processed, and shortly after,
+                the download of the results should begin.
+            </div>
+            <div class="using-service-images">
+                <img src="{% static '/media/service4.jpeg' %}" alt="service4">
+            </div>
+            <div class="help-text-2">
+                In case of success you should see a success message.
+            </div>
+            <div class="using-service-images">
+                <img src="{% static '/media/serviceSuccess.jpeg' %}" alt="serviceSuccess">
+            </div>
+            <div class="help-text-2">
+                If an error occurs during the data processing an error message is going to appear indicating what is the error or where the error was produced.
+            </div>
+            <div class="using-service-images">
+                <img src="{% static '/media/serviceError.jpeg' %}" alt="serviceError">
+            </div>
+            <div class="landing-title">
+                Result interpretation
+            </div>
+            <div class="help-text">
+                The output of the service consist in a zip file that contain the following files:
+                <ul>
+                    <li class="margin-b-40">
+                        <b>Calculated Fluxed:</b> The calculated fluxes dataframe is a .csv file containing the results of the Pheflux algorithm for predicting metabolic fluxes. 
+                        Each row in the file represents a metabolic reaction along with its corresponding predicted flux value. The format of each row is as follows: Column 1 contains 
+                        the identifier of the metabolic reaction, typically following a specific convention for representing chemical reactions in a metabolic model. 
+                        Column 2 contains the numerical value of the predicted metabolic flux for the corresponding reaction.
+                    </li>
+                    <li class="margin-b-40">
+                        <b>Logs File:</b> The log file is a .csv document that provides relevant information regarding the delivered results. It offers details on various experimental conditions, 
+                        the number of variables involved in the analysis, the execution time, and the resolution status. The included information consists of the following parameters: "Condition" 
+                        signifies the experimental condition or system state, "N° variables" represents the number of variables involved in the analysis, "Time" indicates the execution time of the analysis in seconds, 
+                        reflecting the total duration required for predicting metabolic fluxes. Lastly, "Status" denotes the resolution status of the analysis, taking on different values to indicate whether the prediction was successfully executed. 
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
